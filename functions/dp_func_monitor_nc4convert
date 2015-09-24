@@ -1,0 +1,33 @@
+#! /bin/bash
+# 2015/01/21 by Mao-Lin Shen
+set -e
+#########################################################################
+# Monitoring the converting process of output & restart files  
+#------------------------------------------------------------------------
+. ${funcPath}/../DP_config.sh
+counter=10
+tempS=10
+lastensmem=`echo ${Prediction_ensembles} | awk -F " " '{print $NF}'`
+lastmem=`echo 000${lastensmem} | tail -c3 `
+while (( ${counter}  )) ; do 
+  # 
+  targetFN=${ConversionDIR}/${Pred_CasePrefix}_mem${lastmem}/atm/hist/${Pred_CasePrefix}_mem${lastmem}.cam2.h0.${yr}-${Tmm}.nc
+  
+  if [ ! -f ${targetFN} ]; then
+    (( counter = counter - 1 ))
+    sleep ${tempS}
+    jobStatus=`qstat -u earnest 2>/dev/null | grep noresm2netcdf4 | awk '{print $10}'| tail -c2 `
+    if [ -z "${jobStatus}" -o "${jobStatus}" == "C" ]; then
+      cd ${funcPath}
+      mv r_noresm2netcdf4* ${WORKDIR}/Logs || echo "No old log files left ...  "
+      qsub dp_func_noresm2netcdf4
+      cd ..
+      sleep 1200
+    else
+      sleep 1200
+    fi
+  else
+    counter=0
+  fi
+done
+

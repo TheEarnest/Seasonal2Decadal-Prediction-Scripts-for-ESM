@@ -1,0 +1,70 @@
+#! /bin/bash
+# 2015/05/08 by Mao-Lin Shen
+set -e
+#########################################################################
+# Monitoring all jobs status, including those starting in different years 
+# independent from the main script
+#------------------------------------------------------------------------
+. ${funcPath}/../DP_config.sh
+tempS=10
+
+while (( ${counter}  )) ; do 
+
+
+
+
+
+
+#########################################################################
+# Monitoring the run
+# should go for checking all jobs condition, including different starting years
+#------------------------------------------------------------------------
+
+export yr=`echo ${NewDate} | cut -c1-4 `
+export mm=`echo ${NewDate} | cut -c6-7 `
+export dd=`echo ${NewDate} | tail -c3 `
+NewDate=`${python} ${funcPath}/dp_func_datecheck.py ${yr} ${mm} ${dd} months ${Prediction_length} `
+Nmm=`echo ${NewDate} | cut -c6-7 `
+if [ "${Nmm}" == "${mm}" ]; then
+  (( Tmm = Nmm - 1 ))
+else
+  Tmm=${Nmm}
+fi
+
+is_Prediction_finished=0
+chkcounter=0
+while (( ! ${is_Prediction_finished} )); do
+  set -e
+  is_Prediction_finished=1
+  mm=${Prediction_start_month}
+
+  for im in ${Prediction_ensembles}; do
+    mem=`echo 00${im} | tail -c3 `
+    checkfile1=${ARCHIVE}/${Pred_CasePrefix}_mem${mem}/ocn/hist/${Pred_CasePrefix}_mem${mem}.micom.hm.${yr}-${Tmm}.nc
+    checkfile2=${ConversionDIR}/${Pred_CasePrefix}_mem${mem}/ocn/hist/${Pred_CasePrefix}_mem${mem}.micom.hm.${yr}-${Tmm}.nc
+    if [ ! -f ${checkfile1} ] && [  ! -f ${checkfile2}  ] ; then
+      is_Prediction_finished=0
+    else
+      CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} | grep "${prefix_Prun}_Done"` || CStatus="None"
+      if [ "${CStatus}" == "None" ]; then
+        JobStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} `
+        JobNewStatus=`echo ${JobStatus} | sed "s/${prefix_Prun}_S/${prefix_Prun}_Done/" `
+        sed -i s/"${JobStatus}"/"${JobNewStatus}"/g ${Prediction_sys_log}
+      fi # end of status update
+    fi
+  done
+  if [ "${is_Prediction_finished}" == "0" ]; then
+    (( chkcounter = chkcounter + 1 ))
+    echo "Prediction jobs are not finished yet, sleep 90 s for the "${chkcounter}" times" 
+    sleep 90
+  fi
+done
+
+
+
+
+
+
+
+done
+

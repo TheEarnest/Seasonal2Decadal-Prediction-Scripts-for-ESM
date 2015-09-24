@@ -1,0 +1,49 @@
+#! /bin/bash
+# 2015/01/15 by Mao-Lin Shen
+#########################################################################
+# prepare restart files for NorESM
+#------------------------------------------------------------------------
+set -e
+is_restart_files_ok=1
+#for im in ${EnKF_ensembles} ; do
+#  mem=`echo 0${im} | tail -3c`
+  rest_tar_file=${RESTtar_path}/${REST_CaseName}${mem}/rest/${yr}-${mm}-${M_dd}-00000.tar.gz
+  targetFolder=${rest_path}/${REST_CaseName}${mem}/rest
+  targetfile=${targetFolder}/${yr}-${mm}-${M_dd}-00000/${REST_CaseName}${mem}.micom.r.${yr}-${mm}-${M_dd}-00000.nc
+  echo "Check and untar restart files of "${REST_CaseName}${mem}" ......."
+  if [ ! -f ${targetfile} ]; then
+    if [ ! -f ${targetFolder} ]; then
+      mkdir -p ${targetFolder}
+    fi
+    tar xvf ${rest_tar_file} -C ${targetFolder}
+    # check the ocean restart file
+  fi
+  # check the ocean restart file
+  Vcheck=`cdo output -fldmax -selvar,buoyfl ${targetfile}`
+  CVcheck=`echo "scale=0; ${Vcheck}*10000" | bc -l `
+  RVcheck=`echo "scale=0; ${CVcheck}/1" | bc -l `
+  if [ ${RVcheck} -ne 0 ]; then
+    echo "Restart file of ocean (micom) is ok. "
+  else
+    is_restart_files_ok=0
+    Max_try=2
+    echo "Restart file of ocean (micom) is damaged ............... "
+    echo ${prefix_mem}""${mem}" "${prefix_Pyear}"_"${yr}" "${prefix_Pmonth}"_"${mm}" Restart file damages!!!!!!!!!!!!!!! " >> ${Prediction_sys_log}
+    while (( ${Max_try}  )); do 
+      (( Max_try = Max_try - 1 ))
+      sleep 5
+      tar xvf ${rest_tar_file} -C ${targetFolder}
+      sleep 5
+      # recheck
+      Vcheck=`cdo output -fldmax -selvar,buoyfl ${targetfile}`
+      CVcheck=`echo "scale=0; ${Vcheck}*10000" | bc -l `
+      RVcheck=`echo "scale=0; ${CVcheck}/1" | bc -l `
+      if [ ${RVcheck} -ne 0 ]; then
+        Max_try=0
+      fi
+    done
+  fi
+#done  # for ensembles
+if [ "${is_restart_files_ok}" == "0" ]; then
+  exit 1
+fi

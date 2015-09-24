@@ -1,0 +1,12 @@
+
+ met_data_file    = '#nuYEAR/ERAint_nuCAM_#nuYEAR#nuMONTH_MLS310315.nc'
+ met_data_path    = '#nuPath/ERAL26'
+
+ met_filenames_list   = '#nuPath/ERAint_F19tn21L26_MLS310315.txt'
+
+ met_fix_mass   = .true.
+ met_max_rlx = #CAM_Max_rlx
+ met_rlx_bot    = 50.
+ met_rlx_top    = 60.
+ met_BLC_factor = -1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.
+

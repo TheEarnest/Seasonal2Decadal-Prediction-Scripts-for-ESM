@@ -1,0 +1,103 @@
+#!/bin/bash -e
+
+### CUSTOMIZE ###
+
+#PBS -A nn9039k
+#PBS -N r_noresm2netcdf4
+#PBS -l mppwidth=64
+#PBS -l walltime=00:59:00
+#PBS -S /bin/bash
+#PBS -V
+
+set -e
+nthreads=64
+# archive path of case
+#Here we cannot use common.sh because Home folder not accessible from running node
+VERSION='NorCPM_F19_tn21_mem'
+ARCHIVE=''
+CONVERSION_FOLDER='/work/earnest/Conversion/FF05_06h_iOA3_pn16d_pL6_pM11_pY1996/'
+ENSSIZE=30
+
+# zip restart files?
+ZIPRES=1 
+
+# remove log files? 
+RMLOGS=1
+
+#################
+
+# load modules 
+module load netcdf
+module load nco
+
+# Set script name
+sn=noresm2netcdf4
+
+# Set various variables
+#nccopy=`which nccopy`
+nccopy=/opt/cray/netcdf/4.1.3/gnu/46/bin/nccopy
+ncdump=`which ncdump`
+complevel=5 # 1-9
+lid="`date +%y%m%d-%H%M%S`"
+IMEM_START=1
+IMEM_END=${ENSSIZE}
+
+convert_cmd () {
+  aprun -n 1 $nccopy -k 4 -s -d $complevel $ncfile $2/$ncfile 
+  rm ${1}${ncfile}
+}
+
+compress_cmd () {
+  aprun -n 1 tar -zcvf $2/rest/${folder}.tar.gz  $folder  
+  rm -rf ${1}/rest/${folder} 
+}
+
+
+convert_loop () {
+cd $1
+for elm in atm cpl ice lnd ocn 
+do
+  mkdir -p $2/${elm}/hist
+  cd $1/${elm}/hist/
+  for ncfile in `find . -name "${VERSION}${IMEM}*.nc" -print`
+  do
+     echo converting $ncfile 
+    while :; do
+         NJOBS=`jobs -p|wc -l`
+         if [[ $NJOBS && $NJOBS -lt $nthreads ]]; then
+           convert_cmd ${1}${elm}/hist/ $2/${elm}/hist &
+           break
+         fi
+        sleep 1s   #1 Second
+    done  #Infinit loop
+  done  #nc loop
+done
+mkdir -p $2/rest/
+cd $1/rest
+for folder in `find . -name "????-??-??-00000" -print `
+do
+     echo taring  $1/$folder 
+      while :; do
+        NJOBS=`jobs -p|wc -l`
+        if [[ $NJOBS && $NJOBS -lt $nthreads ]]; then
+          compress_cmd $1 $2  &
+          break
+       fi
+       sleep 1s
+      done
+done
+}
+
+# Execute convert loop 
+mkdir -p ${CONVERSION_FOLDER}
+for mem in `seq ${IMEM_START} ${IMEM_END}`
+do
+  IMEM=$(echo 0$mem | tail -c3 )
+  mkdir -p ${CONVERSION_FOLDER}${VERSION}${IMEM}
+  if [ -d ${ARCHIVE}/${VERSION}${IMEM}/ ]
+  then 
+    convert_loop ${ARCHIVE}${VERSION}${IMEM}/ ${CONVERSION_FOLDER}${VERSION}${IMEM}/ >> /work/$USER/noresm/Logs/$sn.log.$lid 
+  fi 
+done
+wait
+echo "${sn}: conversion completed."

@@ -1,0 +1,177 @@
+#! /bin/bash
+# 2015/07/03 by Mao-Lin Shen
+set -ex
+#########################################################################
+# double check if the jobs are all ready     
+# some should be skip if the job is finished!!!!.......
+#------------------------------------------------------------------------
+dd=`echo 00${M_dd} | tail -c3 `
+mm=${M_mm}; yr=${M_yr}
+nudging_period=`echo ${nudging_length} | sed 's/.$//'`
+nudging_base=`echo ${nudging_length} | tail -c2`
+if [ "${nudging_base}" == "d" ]; then
+  NewDate=`${python} ${funcPath}/dp_func_datecheck.py ${yr} ${mm} ${dd} days ${nudging_period} `
+elif [ "${nudging_base}" == "m" ]; then
+  NewDate=`${python} ${funcPath}/dp_func_datecheck.py ${yr} ${mm} ${dd} months ${nudging_period} `
+elif [ "${nudging_base}" == "y" ]; then
+  (( TYear = yr + nudging_period ))
+  NewDate=${TYear}-${mm}-${dd}
+fi
+
+for im in ${Prediction_ensembles}; do
+  is_PredictionStart=1
+  mem=`echo 00${im} | tail -3c`
+  CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} | grep "${prefix_Prun}_" ` || CStatus="None"
+  if [ "${CStatus}" == "None" ] ; then
+    is_PredictionStart=0
+  fi
+
+  if [ "${is_PredictionStart}" == "0" ]; then
+    for im in ${Prediction_ensembles}; do
+      mem=`echo 00${im} | tail -3c`
+      # Double check the job status ...
+      CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} | grep "${prefix_CAMnudging}_Done" ` || CStatus="None"
+      if [ "${CStatus}" == "None" ]; then
+        is_jobs_ready4Prediction=0
+        echo "Re-check job status ................"
+        exit
+      fi
+      # duplicate restartddd files 
+      echo "Dupplicate restart files for member "${mem}" ...  "
+      sourceDIR=${ARCHIVE}/${REST_CaseName}${mem}/rest/${NewDate}-00000
+      targetDIR1=${rest_path}/${REST_CaseName}${mem}/rest
+      targetFile2=${ConversionDIR}/${Pred_CasePrefix}_mem${mem}/rest/${NewDate}-00000.tar.gz
+      if [ -d ${targetDIR1}/${NewDate}-00000 ]; then
+        fileN=${REST_CaseName}${mem}.cam2.rh0.${NewDate}-00000.nc
+        fileCheck=`diff ${sourceDIR}/${fileN} ${targetDIR2}/${NewDate}-00000/${fileN} | awk -F " " '{print $1}'`
+        if [ "${fileCheck}" == "" ]; then
+          echo "Files dupplicated for member "${mem}" ...  " 
+        else
+          cp -rf ${sourceDIR} ${targetDIR1} 
+          echo "Files dupplicated for member "${mem}" ...  " 
+        fi
+      elif [ -f ${targetFile2} ]; then
+        tar xvf ${targetFile2} -C ${targetDIR1} 
+      else
+        cp -rf ${sourceDIR} ${targetDIR1}
+        echo "Files dupplicated for member "${mem}" ...  " 
+      fi
+    done  # for ensembles
+  fi
+done
+#########################################################################
+# Convert output to NC4
+#------------------------------------------------------------------------
+echo "Monitoring the format conversion ..."
+nc4Scriptfn=${funcPath}"/dp_func_noresm2netcdf4"
+ConverFolder=${ConversionDIR}"/"
+FolderStr=`echo ${ConverFolder} | sed 's/\//\\\\\//g'` 
+ARCHIVESTr=`echo ${ARCHIVE}"/" | sed 's/\//\\\\\//g'`
+sed -i s/"ARCHIVE=".*/"ARCHIVE=\'${ARCHIVEStr}\'"/g ${nc4Scriptfn}
+sed -i s/"VERSION=".*/"VERSION=\'${Pred_CasePrefix}_mem\'"/g ${nc4Scriptfn}
+sed -i s/"CONVERSION_FOLDER=".*/"CONVERSION_FOLDER=\'${FolderStr}\'"/g ${nc4Scriptfn}
+
+
+# export yr=`echo ${NewDate} | cut -c1-4 `
+# export mm=`echo ${NewDate} | cut -c6-7 `
+# export dd=`echo ${NewDate} | tail -c3 `
+# NewDate=`${python} ${funcPath}/dp_func_datecheck.py ${yr} ${mm} ${dd} months ${Prediction_length} `
+
+
+export Nyr=`echo ${NewDate} | cut -c1-4 `
+export Nmm=`echo ${NewDate} | cut -c6-7 `
+export Ndd=`echo ${NewDate} | tail -c3 `
+
+#if [ "${Nmm}" == "${mm}" ]; then
+#  Tmm=`echo "(${Nmm}-1)" | bc -l` 
+#else
+  Tmm=${Nmm}
+#fi
+
+# get pid of dp_func_monitor_nc4convert
+nc4convert_pid=`ps | grep dp_func_monit | awk -F " " '{print $1}' `
+if [ "${nc4convert_pid}" == "" ]; then
+  cd ${funcPath}
+#  ./dp_func_monitor_nc4convert    &
+  cd ..
+fi
+
+set -e
+#########################################################################
+# No need to re-create cases, but have to change the nudging namelist 
+#------------------------------------------------------------------------
+firstmem=`echo ${Prediction_ensembles} | awk -F " " '{print $1}' `
+firstmem=`echo 000${firstmem} | tail -c3 `
+levs="600.524200000003 696.796290000003 787.702060000003 867.160760000001 929.648875000002 970.554830000001 992.5561"
+#  CAM_Max_rlx, met_BLC_factor
+blev=992.5561
+tlev=600.524200000003
+dlev=`echo "(${blev}-${tlev})" | bc -l `
+BLC_factors=""
+for tlev in ${levs}; do 
+  factor=`echo "(${blev}-${tlev})/${dlev}*${CAM_Max_rlx}" | bc -l `
+  BLC_factors=${factor}", "${BLC_factors}
+done
+BLC_factors=${BLC_factors}"-1.,-1.,-1."
+NP_STOP_OPTION=nmonth
+NP_MaxRun=7 # months
+if (( ${Prediction_months} <= ${NP_MaxRun} )) ; then
+  NP_RESUBMIT=0
+  NP_STOP_N=${Prediction_months}
+else
+  (( NP_RESUBMIT = Prediction_months / NP_MaxRun  ))
+  NP_STOP_N=${NP_MaxRun}
+fi
+for mem in ${Prediction_ensembles} ; do
+  mem=`echo ${mem} | tail -c3 | bc -l`
+  mem=`echo 00${mem} | tail -c3 ` # re-format
+  CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} | grep "${prefix_Prun}_"` || CStatus="None"
+#  Code4Nudging=`grep met_data_file ${caseDIR}/${Pred_CasePrefix}_mem01/Buildconf/cam.buildnml.csh | cut -c1-9 ` || Code4Nudging="None"
+
+  if [ "${CStatus}" == "None" ] ; then
+    sed -i s/"met_BLC_factor =".*/"met_BLC_factor = ${BLC_factors}"/g ${caseDIR}/${Pred_CasePrefix}_mem${mem}/Buildconf/cam.buildnml.csh
+    cd ${caseDIR}/${Pred_CasePrefix}_mem${mem}
+    xmlchange -file env_run.xml -id CONTINUE_RUN -val TRUE
+    xmlchange -file env_run.xml -id RESUBMIT -val ${NP_RESUBMIT}
+    xmlchange -file env_run.xml -id STOP_N -val ${NP_STOP_N}
+    xmlchange -file env_run.xml -id STOP_OPTION -val ${NP_STOP_OPTION} 
+    sed -i s/"PBS -N ".*/"PBS -N r_SESMpt${mem}"/g  ${Pred_CasePrefix}_mem${mem}.${machine}.run
+    ./${Pred_CasePrefix}_mem${mem}.${machine}.build 
+  fi
+done # do for all the ensemble members
+
+####################################################################### 
+# Submit the jobs
+#--------------------------------------------------------------------
+# check the prediction start date..............
+
+for mem in ${Prediction_ensembles} ; do
+  mem=`echo ${mem} | tail -c3 | bc -l`
+  mem=`echo 00${mem} | tail -c3 ` # re-format
+  CStatusD=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} | grep "${prefix_Prun}_D"` || CStatusD="None"
+  if [ "${CStatusD}" == "None" ] ; then
+    is_job_submitted=0
+    while (( ! ${is_job_submitted} )); do
+      cd ${caseDIR}/${Pred_CasePrefix}_mem${mem}
+      checkfile=${Pred_CasePrefix}_mem${mem}.micom.r.${Nyr}-${Nmm}-${Ndd}-00000.nc
+      checkfile1=${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/${checkfile}
+      checkfile2=${rest_path}/${Pred_CasePrefix}_mem${mem}/rest/${Nyr}-${Nmm}-${Ndd}-00000/${checkfile}
+      if [ -f ${checkfile1} ]; then
+        filecheck=`diff ${checkfile1} ${checkfile2} | awk -F " " '{print $1}' `
+        if [ "${fileCheck}" == "" ] && [ -f ${Pred_CasePrefix}_mem${mem}.${machine}.submit ] ; then
+          ./${Pred_CasePrefix}_mem${mem}.${machine}.submit
+          is_job_submitted=1
+        else
+          sleep 5
+        fi
+      fi
+      sleep 0.5s
+    done
+    JobStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} `
+    JobNewStatus=${JobStatus}" "${prefix_Prun}"_S"
+    sed -i s/"${JobStatus}"/"${JobNewStatus}"/g ${Prediction_sys_log}
+    sleep 5s
+  fi
+done
+
+

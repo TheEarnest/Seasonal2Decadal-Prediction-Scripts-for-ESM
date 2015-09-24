@@ -1,0 +1,82 @@
+#! /bin/bash
+# 2015/01/21 by Mao-Lin Shen
+#########################################################################
+# check prediction status. Base on the assigned argument    
+#------------------------------------------------------------------------
+
+  . ${funcPath}/../DP_config.sh 
+
+set -e
+if [[ -n $1 ]] ; then
+  # "chkTarget" can be ALL, RES (restart files), CRE (job create), DAO (ocean initialization), nAT (atmosphere nudging), RUN (prediction run), COV (finished convert) 
+  chkTarget=$1
+else
+  chkTarget="ALL"
+fi
+
+if [ "${chkTarget}" = "ALL" ]; then
+  is_check_RES=1
+  is_check_CRE=1
+  is_check_DAO=1
+  is_check_nAT=1
+  is_check_RUN=1
+  is_check_COV=1
+elif [ "${chkTarget}" = "CRE" ]; then
+  is_check_CRE=1
+elif [ "${chkTarget}" = "RES" ]; then
+  is_check_RES=1
+elif [ "${chkTarget}" = "DAO" ]; then
+  is_check_DAO=1
+elif [ "${chkTarget}" = "nAT" ]; then
+  is_check_nAT=1
+elif [ "${chkTarget}" = "RUN" ]; then
+  is_check_RUN=1
+elif [ "${chkTarget}" = "COV" ]; then
+  is_check_COV=1
+fi
+set -ex
+#########################################################################
+# check necessary restart files    
+#------------------------------------------------------------------------
+if [ "${is_check_RES}" == "1" ]; then
+  yr=`echo 000${M_yr} | tail -5c`
+  mm=${Analysis_restart_months}
+  for im in ${Prediction_ensembles}; do
+    mem=`echo 0${im} | tail -3c`
+    rest_tar_file=${RESTtar_path}/${REST_CaseName}${mem}/rest/${yr}-${mm}-${M_dd}-00000.tar.gz
+    if [ ! -f ${rest_tar_file} ]; then
+      echo "Missing restart file "${yr}-${mm}"-${M_dd}-00000.tar.gz for "${VERSION}${mem}" " 
+      exit 1
+    fi
+  done # for ensembles
+  echo "Restart files is ready for "${year}"."
+fi
+
+#########################################################################
+# check "cases" & sys_log to confirm the status of cases    
+#------------------------------------------------------------------------
+if [ "${is_check_CRE}" == "1" ]; then
+  predicCdir=/work/${USER}/Conversion/${Prediction_CaseName}
+  if [ ! -d ${predicCdir} ]; then
+    mkdir -p ${predicCdir}
+  fi
+  predicLog=${funcPath}/sys_dp_${Prediction_CaseName}
+  if [ ! -f ${Prediction_sys_log} ]; then
+    echo "Member Year Month DA_Ocean nudATM Prediction" > ${Prediction_sys_log}
+  fi
+  rm ${funcPath}/sys_dp_* || echo "No old log files left ... "
+  ln -sf ${Prediction_sys_log} ${predicLog}
+fi
+
+if [ "${is_check_DAO}" == "1" ]; then
+  echo ${is_check_DAO}
+fi
+
+if [ "${is_check_nAT}" == "1" ]; then
+  echo ${is_check_DAO}
+fi
+
+if [ "${is_check_RUN}" == "1" ]; then
+  echo ${is_check_DAO}
+fi
+

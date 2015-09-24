@@ -1,0 +1,122 @@
+#! /bin/bash
+# 2015/01/15 by Mao-Lin Shen
+set -e
+# modify $NorCPM_config  "personal_setting.sh" in NorCPM    
+sed -i s/"CASEDIR=".*/"CASEDIR=\'${Pred_CasePrefix}\'"/g ${NorCPM_config}
+sed -i s/"Ensembles=".*/"Ensembles=\'${Prediction_ensembles}\'"/g ${NorCPM_config}
+sed -i s/"ens_start_date=".*/"ens_start_date=${yr}-${mm}-15-00000"/g ${NorCPM_config}
+sed -i s/"branched_ens_date=".*/"branched_ens_date=${yr}-01-01-00000"/g ${NorCPM_config}
+sed -i s/"SKIPASSIM=".*/"SKIPASSIM=1"/g ${NorCPM_config}
+sed -i s/"SKIPPROP=".*/"SKIPPROP=1"/g ${NorCPM_config}
+sed -i s/"the_start_date=".*/"the_start_date=${yr}-${mm}-15-00000"/g ${NorCPM_config}
+sed -i s/"RFACTOR=".*/"RFACTOR=0"/g ${NorCPM_config}
+sed -i s/"ENDYEAR=".*/"ENDYEAR=${yr}"/g ${NorCPM_config}
+sed -i s/"ENSSIZE=".*/"ENSSIZE=${ENSSIZE}"/g ${NorCPM_config}
+sed -i s/"nbbatch=".*/"nbbatch=${nbbatch}"/g ${NorCPM_config}
+
+ln -sf ${HOMEDIR}/bin/launcher30 ${HOMEDIR}/bin/launcher${ENSSIZE}
+
+#########################################################################
+# prepare restart files for NorCPM
+#------------------------------------------------------------------------
+for im in ${EnKF_ensembles} ; do
+  mem=`echo 0${im} | tail -3c`
+  rest_tar_file=${RESTtar_path}/${REST_CaseName}${mem}/rest/${yr}-${mm}-15-00000.tar.gz
+  targetFolder=${rest_path}/${REST_CaseName}${mem}/rest
+  targetfile=${rest_path}/${REST_CaseName}${mem}/rest/${yr}-${mm}-15-00000/${REST_CaseName}${mem}.micom.r.${yr}-${mm}-15-00000.nc
+  echo "Check and untar restart files of "${REST_CaseName}${mem}" ......."
+  if [ ! -f ${targetfile} ]; then
+    tar xvf ${rest_tar_file} -C ${targetFolder}
+  fi
+done  # for ensembles
+
+#########################################################################
+# Clear old case and replace links for executables
+#------------------------------------------------------------------------
+echo "Clear old cases ..."
+rm -rf ${HOMEDIR}/cases/${Pred_CasePrefix}_mem??
+rm -rf ${WORKDIR}/ANALYSIS/*
+echo "Clear old restart files ..."
+rm -rf ${ARCHIVE}/${Pred_CasePrefix}_mem??/rest/*
+echo "Clear old model files ..."
+rm -rf ${WORKDIR}/${Pred_CasePrefix}_mem??/run/*.nc
+rm -rf ${WORKDIR}/${Pred_CasePrefix}_mem??/run/*.log.*
+rm -rf ${WORKDIR}/${Pred_CasePrefix}_mem??/run/*.bldlog.*
+echo "Re-link obj & executables in case 01 ..."
+mem01folder=${WORKDIR}/${Pred_CasePrefix}_mem01
+exec_source=${WORKDIR}/${Normal_Exec_templet_CaseName}
+if [ -d ${mem01folder} ]; then
+  rm -rf atm cpl glc ice lib lnd ocn ccsm mct csm_share pio
+  ln -sf ${exec_source}/atm ${mem01folder}
+  ln -sf ${exec_source}/cpl ${mem01folder}
+  ln -sf ${exec_source}/glc ${mem01folder}
+  ln -sf ${exec_source}/ice ${mem01folder}
+  ln -sf ${exec_source}/lib ${mem01folder}
+  ln -sf ${exec_source}/lnd ${mem01folder}
+  ln -sf ${exec_source}/mct ${mem01folder}
+  ln -sf ${exec_source}/pio ${mem01folder}
+  ln -sf ${exec_source}/ocn ${mem01folder}
+  ln -sf ${exec_source}/ccsm ${mem01folder}
+  ln -sf ${exec_source}/csm_share ${mem01folder}
+  cp ${exec_source}/${Normal_Exec_templet_CaseName}.ccsm.exe ${mem01folder}/${Pred_CasePrefix}_mem01.ccsm.exe
+fi
+
+#########################################################################
+# Re-create ensembles
+#------------------------------------------------------------------------
+ . ${funcPath}/dp_func_create_ensemble.sh
+
+#########################################################################
+# Re-run EnKF full field ocean initialization
+#------------------------------------------------------------------------
+LID="`date +%y%m%d_%H%M%S`"
+logprefix=r_EnKF_main_ff
+mv ${logprefix}_* ${WORKDIR}/Logs  || echo 'No old log files ...'
+stdout=${logprefix}_${LID}_log
+stderr=${logprefix}_${LID}_err
+
+cd ${funcPath}
+./dp_func_EnKF_main.sh 1> ${stdout} 2> ${stderr} &
+
+# get pid of EnKF_main_DP
+EnKF_pid=`ps | grep dp_func_En | awk -F " " '{print $1}' `
+
+#########################################################################
+# Monitoring the run
+#------------------------------------------------------------------------
+is_EnKF_not_finished=1
+chkcounter=0
+while (( ${is_EnKF_finished} )); do 
+  is_EnKF_not_finished=0
+  mm=${Analysis_restart_months}
+  
+  for im in ${EnKF_ensembles}; do 
+    mem=`echo 00${im} | tail -c3 `
+    checkfile=${ARCHIVE}/${Pred_CasePrefix}_mem${mem}/rest/${yr}-${mm}-15-00000/${Pred_CasePrefix}_mem${mem}.micom.r.${yr}-${mm}-15-00000.nc
+    if [ ! -f ${checkfile} ]; then
+      is_EnKF_not_finished=1
+    fi
+  done
+  sleep 90
+  (( chkcounter = chkcounter + 1 ))
+  echo ${is_EnKF_finished}", "${chkcounter}
+done
+
+#########################################################################
+# Ocean initialization is ready, kill EnKF
+#------------------------------------------------------------------------
+set -e
+
+ kill ${EnKF_pid}
+
+#########################################################################
+# Prepare the restart files for nudging run
+#------------------------------------------------------------------------
+for im in ${EnKF_ensembles} ; do
+  mem=`echo 0${im} | tail -3c`
+  rest_folder=${ARCHIVE}/${Pred_CasePrefix}_mem${mem}/rest/${yr}-${mm}-15-00000
+  targetFolder=${rest_path}/${Pred_CasePrefix}_mem${mem}/rest
+  cp -rf ${rest_folder} ${targetFolder}
+done  # for ensembles
+
+

@@ -1,0 +1,85 @@
+#! /bin/bash
+# 2015/01/15 by Mao-Lin Shen
+set -e
+copy="cp -rf "
+mm=${M_mm}; yr=${M_yr}
+# modify $CAMnudging_config  "dp_SD_config.sh" in NorCPM    
+sed -i s/"CASEDIR=".*/"CASEDIR=\'${Pred_CasePrefix}\'"/g ${CAMnudging_config}
+sed -i s/"Ensembles=".*/"Ensembles=\'${Prediction_ensembles}\'"/g ${CAMnudging_config}
+sed -i s/"ens_start_date=".*/"ens_start_date=${yr}-${mm}-${M_dd}-00000"/g ${CAMnudging_config}
+sed -i s/"branched_ens_date=".*/"branched_ens_date=${yr}-01-01-00000"/g ${CAMnudging_config}
+sed -i s/"the_start_date=".*/"the_start_date=${yr}-${mm}-${M_dd}-00000"/g ${CAMnudging_config}
+
+
+#########################################################################
+# prepare restart files for NorESM
+#------------------------------------------------------------------------
+export mem=${mem}
+export firstmem=`echo 000${firstmem} | tail -c3 `
+  . ${funcPath}/dp_func_untar_and_check_restartF
+#########################################################################
+# Clear old case and replace links for executables
+#------------------------------------------------------------------------
+echo "Clear old cases ..."
+
+rm -rf ${caseDIR}/${Pred_CasePrefix}_mem${mem} || {
+  sleep 10
+  rm -rf ${caseDIR}/${Pred_CasePrefix}_mem${mem}
+}
+
+echo "Clear old restart files ..."
+rm -rf ${ARCHIVE}/${Pred_CasePrefix}_mem${mem}/rest/${yr}-??-${M_dd}-00000
+echo "Clear old model files ..."
+rm -rf ${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/*.nc
+rm -rf ${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/*.log.*
+rm -rf ${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/*.bldlog.*
+echo "Re-link obj & executables in case 01 ..."
+mem01folder=${WORKDIR}/${Pred_CasePrefix}_mem${firstmem}
+exec_source=/work/${USER}/noresm/${Nudging_Exec_templet_CaseName}
+
+if [ ! -d ${mem01folder} ]; then
+  mkdir ${mem01folder}
+  cd ${mem01folder}
+  rm -rf atm cpl glc ice lib lnd ocn ccsm mct csm_share pio
+  ${copy} ${exec_source}/atm ${mem01folder}
+  ${copy} ${exec_source}/cpl ${mem01folder}
+  ${copy} ${exec_source}/glc ${mem01folder}
+  ${copy} ${exec_source}/ice ${mem01folder}
+  ${copy} ${exec_source}/lib ${mem01folder}
+  ${copy} ${exec_source}/lnd ${mem01folder}
+  ${copy} ${exec_source}/mct ${mem01folder}
+  ${copy} ${exec_source}/pio ${mem01folder}
+  ${copy} ${exec_source}/ocn ${mem01folder}
+  ${copy} ${exec_source}/ccsm ${mem01folder}
+  ${copy} ${exec_source}/csm_share ${mem01folder}
+  mkdir -p ${mem01folder}/run
+  cp ${exec_source}/run/ccsm.exe ${mem01folder}/run
+  cp ${exec_source}/${Nudging_Exec_templet_CaseName}.ccsm.exe ${mem01folder}/${Pred_CasePrefix}_mem${firstmem}.ccsm.exe
+elif [ "${mem}" == "${firstmem}" ]; then
+  cd ${mem01folder}
+  rm -rf atm cpl glc ice lib lnd ocn ccsm mct csm_share pio
+  ${copy} ${exec_source}/atm ${mem01folder}
+  ${copy} ${exec_source}/cpl ${mem01folder}
+  ${copy} ${exec_source}/glc ${mem01folder}
+  ${copy} ${exec_source}/ice ${mem01folder}
+  ${copy} ${exec_source}/lib ${mem01folder}
+  ${copy} ${exec_source}/lnd ${mem01folder}
+  ${copy} ${exec_source}/mct ${mem01folder}
+  ${copy} ${exec_source}/pio ${mem01folder}
+  ${copy} ${exec_source}/ocn ${mem01folder}
+  ${copy} ${exec_source}/ccsm ${mem01folder}
+  ${copy} ${exec_source}/csm_share ${mem01folder}
+  mkdir -p ${mem01folder}/run
+  cp ${exec_source}/run/ccsm.exe ${mem01folder}/run
+  cp ${exec_source}/${Nudging_Exec_templet_CaseName}.ccsm.exe ${mem01folder}/${Pred_CasePrefix}_mem${firstmem}.ccsm.exe
+fi
+
+cd ${funcPath}/../
+
+#########################################################################
+# Re-create ensembles
+#------------------------------------------------------------------------
+ ${funcPath}/dp_func_create_SDcase.sh   
+
+sleep 1
+

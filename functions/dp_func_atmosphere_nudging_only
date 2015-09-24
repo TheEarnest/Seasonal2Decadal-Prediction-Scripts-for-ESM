@@ -1,0 +1,136 @@
+#! /bin/bash
+# 2015/01/21 by Mao-Lin Shen
+set -e
+mm=${M_mm}; yr=${M_yr}
+#########################################################################
+# re-build template nudging case
+#------------------------------------------------------------------------
+temp_dateS=`date`
+#  . ${funcPath}/dp_func_create_template_NudgingCase.sh
+echo ${temp_dateS}
+echo `date`
+#########################################################################
+# check sys_log to confirm the status of cases    
+# change to check for each case instead, 10/04/15 MS
+#------------------------------------------------------------------------
+firstmem=`echo ${Prediction_ensembles} | awk -F " " '{print $1}' `
+firstmem=`echo 000${firstmem} | tail -c3 `
+for mem in ${Prediction_ensembles} ; do 
+  mem=`echo ${mem} | tail -c3 | bc -l`
+  mem=`echo 00${mem} | tail -c3 ` # re-format
+  CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr}  `  || CStatus="None" 
+  checkFolder=${caseDIR}/${Pred_CasePrefix}_mem${mem}
+  #  when should I check the folders???????????
+  #if [ "${CStatus}" == "None" ] || [ ! -d ${checkFolder} ]; then 
+  if [ "${CStatus}" == "None" ]; then
+    . ${funcPath}/dp_func_clear_old_archive
+    . ${funcPath}/dp_func_prepare_nudging_cases
+    #--------------------------------------------------------------------  
+      echo ${prefix_mem}"_"${mem}" "${prefix_Pyear}"_"${yr}" "${prefix_Pmonth}"_"${mm}" "${prefix_DAocean}"_Done" >> ${Prediction_sys_log}
+  fi # end of creating nudging cases
+done # do for all the ensemble members
+
+
+set -ex
+####################################################################### 
+# Submit the jobs
+#----------------------------------------------------------------------
+dd=`echo 00${M_dd} | tail -c3 `
+for mem in ${Prediction_ensembles} ; do
+  mem=`echo ${mem} | tail -c3 | bc -l`
+  mem=`echo 00${mem} | tail -c3 ` # re-format
+  CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep "${prefix_Pyear}"_"${yr}" |grep ${prefix_CAMnudging}_` || CStatus="None"
+  if [ "${CStatus}" == "None" ]; then
+    is_job_submitted=0
+    while (( ! ${is_job_submitted} )); do
+      cd ${caseDIR}/${Pred_CasePrefix}_mem${mem} 
+      checkfile=${Pred_CasePrefix}_mem${mem}.micom.r.${yr}-${mm}-${dd}-00000.nc
+      checkfile1=${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/${checkfile}
+      checkfile2=${rest_path}/${Pred_CasePrefix}_mem${mem}/rest/${yr}-${mm}-${dd}-00000/${checkfile}
+      nudcheckfile=${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/${Pred_CasePrefix}_mem${mem}.cam2.r.${yr}-${mm}-${dd}-00000.nc
+      if [ -f ${nudcheckfile} ]; then
+        nudRestCheck=`ncdump -h ${nudcheckfile} | grep current_metdata_filename` || nudRestCheck="None"
+        if [ "${nudRestCheck}" == "None" ]; then
+          ncatted -O -a current_metdata_filename,global,c,c,"${yr}/ERAint_nuCAM_${yr}${mm}_MLS310315.nc" ${nudcheckfile}
+          NextMonth=`${python} ${funcPath}/dp_func_datecheck.py ${yr} ${mm} ${dd} months 1 `
+          Nyr=`echo ${NextMonth} | cut -c1-4`
+          Nmm=`echo ${NextMonth} | cut -c6-7` 
+          ncatted -O -a next_metdata_filename,global,c,c,"${yr}/ERAint_nuCAM_${Nyr}${Nmm}_MLS310315.nc" ${nudcheckfile}
+        fi
+      fi
+      if [ -f ${checkfile1} ]; then
+        filecheck=`diff ${checkfile1} ${checkfile2} | awk -F " " '{print $1}' `
+        if [ "${fileCheck}" == "" ] && [ -f ${Pred_CasePrefix}_mem${mem}.${machine}.submit ] ; then
+          ./${Pred_CasePrefix}_mem${mem}.${machine}.submit
+          is_job_submitted=1
+        else
+          sleep 5
+        fi
+      fi
+      sleep 0.5s
+    done
+# log submit status
+    JobStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} `
+    JobNewStatus=${JobStatus}" "${prefix_CAMnudging}"_S"    
+    sed -i s/"${JobStatus}"/"${JobNewStatus}"/g ${Prediction_sys_log}
+    sleep 5
+  fi
+done
+
+#########################################################################
+# Monitoring the run
+#------------------------------------------------------------------------
+dd=`echo 00${M_dd} | tail -c3 `
+nudging_period=`echo ${nudging_length} | sed 's/.$//'`
+nudging_base=`echo ${nudging_length} | tail -c2`
+if [ "${nudging_base}" == "d" ]; then
+  NewDate=`${python} ${funcPath}/dp_func_datecheck.py ${yr} ${mm} ${dd} days ${nudging_period} `
+elif [ "${nudging_base}" == "m" ]; then
+  NewDate=`${python} ${funcPath}/dp_func_datecheck.py ${yr} ${mm} ${dd} months ${nudging_period} `
+elif [ "${nudging_base}" == "y" ]; then
+  (( TYear = yr + nudging_period ))
+  NewDate=${TYear}-${mm}-${dd}
+fi
+
+set -e
+is_CAMnudging_finished=1
+for im in ${Prediction_ensembles}; do
+  mem=`echo 00${im} | tail -c3 `
+  CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} | grep "${prefix_CAMnudging}_Done"` || CStatus="None"
+  if [ "${CStatus}" == "None" ]; then
+    is_CAMnudging_finished=0
+  fi
+done
+chkcounter=0
+while (( ! ${is_CAMnudging_finished} )); do
+  is_CAMnudging_finished=1
+
+  for im in ${Prediction_ensembles}; do
+    mem=`echo 00${im} | tail -c3 `
+ # check files in both archive and conversion dir
+ # further using "rpointer.drv" to check model run status 
+    checkfile1=${ARCHIVE}/${Pred_CasePrefix}_mem${mem}/rest/${NewDate}-00000/${Pred_CasePrefix}_mem${mem}.micom.r.${NewDate}-00000.nc
+    checkfile2=${ConversionDIR}/${Pred_CasePrefix}_mem${mem}/rest/${NewDate}-00000.tar.gz
+    rpfile=${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/rpointer.drv
+    rdate=`cat ${rpfile} | awk -F "." '{print $(NF-1)}' | cut -c1-10 `
+    if [ ! -f ${checkfile1} ] && [  ! -f ${checkfile2}  ] && [ "${NewDate}" != "${rdate}" ] ; then
+      is_CAMnudging_finished=0
+      echo "Member "${mem}" is not finished yet ...  "
+    else
+      CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} | grep "${prefix_CAMnudging}_Done"` || CStatus="None"
+      if [ "${CStatus}" == "None" ]; then
+        JobStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} `
+        JobNewStatus=`echo ${JobStatus} | sed "s/${prefix_CAMnudging}_S/${prefix_CAMnudging}_Done/" `
+        sed -i s/"${JobStatus}"/"${JobNewStatus}"/g ${Prediction_sys_log}
+      fi # end of status update
+    fi
+  done
+  (( chkcounter = chkcounter + 1 ))
+  if [ "${is_CAMnudging_finished}" == "0" ]; then
+    echo "Nudging jobs are not finished yet, sleep 90 s for the "${chkcounter}" times" 
+    sleep 90
+  else
+    sleep 60
+  fi
+done
+

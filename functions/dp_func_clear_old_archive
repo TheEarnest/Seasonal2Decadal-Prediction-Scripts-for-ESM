@@ -1,0 +1,13 @@
+#! /bin/bash
+# 2015/01/21 by Mao-Lin Shen
+set -e
+#########################################################################
+# delete old data ...  
+#------------------------------------------------------------------------
+
+rm -rf ${ARCHIVE}/${Pred_CasePrefix}_mem${mem}/rest/${yr}*
+rm -rf ${ARCHIVE}/${Pred_CasePrefix}_mem${mem}/*/hist/*${yr}*
+rm -rf ${ConversionDIR}/${Pred_CasePrefix}_mem${mem}/rest/${yr}*
+rm -rf ${ConversionDIR}/${Pred_CasePrefix}_mem${mem}/*/hist/*${yr}*
+
+echo "Old files are deleted.   "

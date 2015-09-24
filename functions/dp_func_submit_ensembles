@@ -1,0 +1,13 @@
+#! /bin/bash
+# 2015/01/21 by Mao-Lin Shen
+set -e
+#########################################################################
+# Re-run NorESM for nudging run or prediction run  
+#------------------------------------------------------------------------
+for im in ${Prediction_ensembles}; do
+  mem=`echo 00${im} | tail -3c`
+  cd ${caseDIR}/${Pred_CasePrefix}_mem${mem}
+  ./${Pred_CasePrefix}_mem${mem}.${machine}.submit
+  sleep 10
+done  # for ensembles
+

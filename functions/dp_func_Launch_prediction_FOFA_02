@@ -1,0 +1,83 @@
+#! /bin/bash
+# 2015/01/21 by Mao-Lin Shen
+set -e
+mm=${M_mm}; yr=${M_yr}
+NewDate=${M_yr}-${M_mm}-${M_dd}
+Nyr=${M_yr}
+#########################################################################
+# re-build template nudging case
+#------------------------------------------------------------------------
+temp_dateS=`date`
+#  . ${funcPath}/dp_func_create_template_NudgingCase.sh
+echo ${temp_dateS}
+echo `date`
+
+#########################################################################
+# check sys_log to confirm the status of cases    
+# change to check for each case instead, 10/04/15 MS
+#------------------------------------------------------------------------
+firstmem=`echo ${Prediction_ensembles} | awk -F " " '{print $1}' `
+firstmem=`echo 000${firstmem} | tail -c3 `
+for mem in ${Prediction_ensembles} ; do 
+  mem=`echo ${mem} | tail -c3 | bc -l`
+  mem=`echo 00${mem} | tail -c3 ` # re-format
+  CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr}  `  || CStatus="None" 
+  checkFolder=${caseDIR}/${Pred_CasePrefix}_mem${mem}
+  #  when should I check the folders???????????
+  #if [ "${CStatus}" == "None" ] || [ ! -d ${checkFolder} ]; then 
+  if [ "${CStatus}" == "None" ]; then
+    . ${funcPath}/dp_func_clear_old_archive
+    #########################################################################
+    # prepare restart files for NorESM
+    #------------------------------------------------------------------------
+    export mem=${mem}
+    export firstmem=`echo 000${firstmem} | tail -c3 `
+    . ${funcPath}/dp_func_untar_and_check_restartF
+    . ${funcPath}/dp_func_prepare_normal_cases
+    #--------------------------------------------------------------------  
+      echo ${prefix_mem}"_"${mem}" "${prefix_Pyear}"_"${yr}" "${prefix_Pmonth}"_"${mm}" "${prefix_DAocean}"_Done" >> ${Prediction_sys_log}
+  fi # end of creating nudging cases
+done # do for all the ensemble members
+
+
+set -ex
+####################################################################### 
+# Submit the jobs
+#----------------------------------------------------------------------
+dd=`echo 00${M_dd} | tail -c3 `
+for mem in ${Prediction_ensembles} ; do
+  mem=`echo ${mem} | tail -c3 | bc -l`
+  mem=`echo 00${mem} | tail -c3 ` # re-format
+  CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep "${prefix_Pyear}"_"${yr}" |grep ${prefix_Prun}_` || CStatus="None"
+  if [ "${CStatus}" == "None" ]; then
+    is_job_submitted=0
+    while (( ! ${is_job_submitted} )); do
+      cd ${caseDIR}/${Pred_CasePrefix}_mem${mem} 
+      checkfile=${Pred_CasePrefix}_mem${mem}.micom.r.${yr}-${mm}-${dd}-00000.nc
+      checkfile1=${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/${checkfile}
+      checkfile2=${rest_path}/${Pred_CasePrefix}_mem${mem}/rest/${yr}-${mm}-${dd}-00000/${checkfile}
+      nudcheckfile=${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/${Pred_CasePrefix}_mem${mem}.cam2.r.${yr}-${mm}-${dd}-00000.nc
+      if [ -f ${checkfile1} ]; then
+        filecheck=`diff ${checkfile1} ${checkfile2} | awk -F " " '{print $1}' `
+        if [ "${fileCheck}" == "" ] && [ -f ${Pred_CasePrefix}_mem${mem}.${machine}.submit ] ; then
+          ./${Pred_CasePrefix}_mem${mem}.${machine}.submit
+          is_job_submitted=1
+        else
+          sleep 5
+        fi
+      fi
+      sleep 1s
+    done
+# log submit status
+    JobStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} `
+    JobNewStatus=${JobStatus}" "${prefix_Prun}"_S"    
+    sed -i s/"${JobStatus}"/"${JobNewStatus}"/g ${Prediction_sys_log}
+    sleep 5
+  fi
+done
+
+sleep 7200s
+
+
+
+
