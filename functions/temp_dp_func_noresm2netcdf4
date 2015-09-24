@@ -9,13 +9,18 @@
 #PBS -S /bin/bash
 #PBS -V
 
-set -e
+Sdate=`date`
+set -ex
 nthreads=32
 # archive path of case
 #Here we cannot use common.sh because Home folder not accessible from running node
+DataYear=2006
+
+
+
 VERSION='NorCPM_F19_tn21_mem'
-ARCHIVE='/work/earnest/archive/FFSTA_iOA0_pn0d_pL6_pM01_pY1970/'
-CONVERSION_FOLDER='/work/earnest/Conversion/FFSTA_iOA0_pn0d_pL6_pM01_pY1970/'
+ARCHIVE='/work/earnest/archive/archive_FF02_06h/FF02_06h_iOA0_pn78d_pL6_pM08_pY'${DataYear}'/'
+CONVERSION_FOLDER='/work/earnest/Conversion/FF02_06h_iOA0_pn78d_pL6_pM08_pY'${DataYear}'/'
 ENSSIZE=30
 
 # zip restart files?
@@ -43,12 +48,12 @@ IMEM_START=1
 IMEM_END=${ENSSIZE}
 
 convert_cmd () {
-  aprun -n 1 $nccopy -k 4 -s -d $complevel $ncfile $2/$ncfile 
+  $nccopy -k 4 -s -d $complevel $ncfile $2/$ncfile 
   rm ${1}${ncfile}
 }
 
 compress_cmd () {
-  aprun -n 1 tar -zcvf $2/rest/${folder}.tar.gz  $folder  
+  tar -zcvf $2/rest/${folder}.tar.gz  $folder  
   rm -rf ${1}/rest/${folder} 
 }
 
@@ -61,15 +66,8 @@ do
   cd $1/${elm}/hist/
   for ncfile in `find . -name "${VERSION}${IMEM}*.nc" -print`
   do
-     echo converting $ncfile 
-    while :; do
-         NJOBS=`jobs -p|wc -l`
-         if [[ $NJOBS && $NJOBS -lt $nthreads ]]; then
-           convert_cmd ${1}${elm}/hist/ $2/${elm}/hist &
-           break
-         fi
-        sleep 1s   #1 Second
-    done  #Infinit loop
+   echo converting $ncfile 
+   convert_cmd ${1}${elm}/hist/ $2/${elm}/hist 
   done  #nc loop
 done
 mkdir -p $2/rest/
@@ -77,14 +75,7 @@ cd $1/rest
 for folder in `find . -name "????-??-??-00000" -print `
 do
      echo taring  $1/$folder 
-      while :; do
-        NJOBS=`jobs -p|wc -l`
-        if [[ $NJOBS && $NJOBS -lt $nthreads ]]; then
-          compress_cmd $1 $2  &
-          break
-       fi
-       sleep 1s
-      done
+          compress_cmd $1 $2  
 done
 }
 
@@ -101,3 +92,5 @@ do
 done
 wait
 echo "${sn}: conversion completed."
+echo ${Sdate}
+date

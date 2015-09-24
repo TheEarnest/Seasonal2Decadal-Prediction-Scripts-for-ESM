@@ -41,6 +41,9 @@ mem01folder=${WORKDIR}/${Pred_CasePrefix}_mem${firstmem}
 exec_source=/work/${USER}/noresm/${Normal_Exec_templet_CaseName}
 
 if [ ! -d ${mem01folder} ]; then
+  cd ${mem01folder}
+  rm -rf atm cpl glc ice lib lnd ocn ccsm mct csm_share pio
+  rm -rf ${mem01folder}/${Pred_CasePrefix}_mem01.ccsm.exe.*
   ${copy} ${exec_source}/atm ${mem01folder}
   ${copy} ${exec_source}/cpl ${mem01folder}
   ${copy} ${exec_source}/glc ${mem01folder}
@@ -53,7 +56,6 @@ if [ ! -d ${mem01folder} ]; then
   ${copy} ${exec_source}/ccsm ${mem01folder}
   ${copy} ${exec_source}/csm_share ${mem01folder}
   cp ${exec_source}/${Normal_Exec_templet_CaseName}.ccsm.exe ${mem01folder}/${Pred_CasePrefix}_mem01.ccsm.exe
-  mkdir -p ${mem01folder}/run
   cp ${exec_source}/run/ccsm.exe ${mem01folder}/run/ccsm.exe
 elif [ "${mem}" == "${firstmem}" ]; then
   cd ${mem01folder}
@@ -71,7 +73,6 @@ elif [ "${mem}" == "${firstmem}" ]; then
   ${copy} ${exec_source}/ccsm ${mem01folder}
   ${copy} ${exec_source}/csm_share ${mem01folder}
   cp ${exec_source}/${Normal_Exec_templet_CaseName}.ccsm.exe ${mem01folder}/${Pred_CasePrefix}_mem01.ccsm.exe
-  mkdir -p ${mem01folder}/run
   cp ${exec_source}/run/ccsm.exe ${mem01folder}/run/ccsm.exe
 fi
 

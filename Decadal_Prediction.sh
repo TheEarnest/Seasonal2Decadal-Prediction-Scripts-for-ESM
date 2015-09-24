@@ -65,16 +65,8 @@ for M_year in ${Prediction_years}; do
   #------------------------------------------------------------------------
   if [ "${is_FOFA}" == "0" ]; then 
     . ${funcPath}/dp_func_atmosphere_nudging_only
-  elif [ "${is_FOFA}" == "1" ]; then
-    echo "Under construction ...  "
-    exit
-    . ${funcPath}/dp_func_atmosphere_nudging_only
-  elif [ "${is_FOFA}" == "2" ]; then
-    echo "No atmosphere nudging ...  "
-  elif [ "${is_FOFA}" == "3" ]; then
-    . ${funcPath}/dp_func_atmosphere_nudging_only
   else
-    echo "Under construction  ...  "
+    echo "Configuration is not finished yet ...  "
     exit
     . ${funcPath}/dp_func_atmosphere_nudging_with_EnKF_SST
   fi
@@ -83,19 +75,8 @@ for M_year in ${Prediction_years}; do
   #########################################################################
   # Launch NorESM prediction 
   #------------------------------------------------------------------------
-  if [ "${is_FOFA}" == "0" ]; then
-    . ${funcPath}/dp_func_Launch_prediction
-  elif [ "${is_FOFA}" == "1" ]; then
-    echo "Under construction ...  "
-    exit
-  elif [ "${is_FOFA}" == "2" ]; then
-    . ${funcPath}/dp_func_Launch_prediction_FOFA_02
-  elif [ "${is_FOFA}" == "3" ]; then
-    . ${funcPath}/dp_func_Launch_prediction_FOFA_03
-  else
-    echo "Under construction  ...  "
-    exit
-  fi
+  . ${funcPath}/dp_func_Launch_prediction
+  done
 
 done # for prediction years
 ###############################################################################

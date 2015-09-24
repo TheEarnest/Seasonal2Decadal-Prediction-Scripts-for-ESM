@@ -3,34 +3,33 @@
 #########################################################################
 # Configurations for decadal prediction 
 #------------------------------------------------------------------------
-Prediction_expPrefix="FF05_06h"
+Prediction_expPrefix="FFSTA"
 REST_CaseName="NorCPM_F19_tn21_mem"
 Pred_CasePrefix="NorCPM_F19_tn21" # new prediction name 
-Prediction_start_date="12-01" # mm-dd
+Prediction_start_date="01-01" # mm-dd
 Prediction_length=6 # months
-Analysis_restart_months="11"
-Analysis_restart_day="15" # fixed by EnKF analysis
+Analysis_restart_months="01"
+Analysis_restart_day="01" # fixed by EnKF analysis
 export CAM_Max_rlx=0.08333333333333333 # maximum nudging coeff 
-#is_FOFA=0; # Initializing ocean fist and follow up with atmosphere nudging ...
+is_FOFA=0; # Initializing ocean fist and follow up with atmosphere nudging ...
 #is_FOFA=1; # Initializing ocean and atmosphere together ...
 #is_FOFA=2; # Initializing ocean only ...
-is_FOFA=3; # Initializing ocean fist and follow up with atmosphere nudging till the end of prediction ...
 
 #########################################################################
 # For ensemble configuration 
 #------------------------------------------------------------------------
-export ENSSIZE=1
+export ENSSIZE=2
 nbbatch=8  #Number of group of job going into the queue
-#export Prediction_ensembles="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30"
-export Prediction_ensembles="25";
+#export Prediction_ensembles="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 19 20 21 22 23 24 25 26 27 28 29 30 18"
+export Prediction_ensembles="30";
 export EnKF_ensembles=`seq 1 ${ENSSIZE}`
 RESTtar_path=/work/earnest/Conversion/FF_ini_try
 
 #FOLLOWING is related to the starting option
 ens_casename='NorCPM_F19_tn21_mem'
 
-#Prediction_years=`seq 2002 2007`
-Prediction_years="1996"
+#Prediction_years=`seq 1991 2006`
+Prediction_years="1965"
 
 #FOLLOWING is related to the starting option
 ens_casename='NorCPM_F19_tn21_mem'
@@ -43,7 +42,7 @@ REST_months="01 02 05 08 11"
 export HOMEDIR=${HOME}/NorESM
 #export WORKDIR=/work/${USER}/noresm
 #export ARCHIVE=/work/${USER}/archive
-export funcPath=/home/uib/earnest/NorESM/Predictions/Decadal_Prediction_SF0506h/functions
+export funcPath=/home/uib/earnest/NorESM/Predictions/Decadal_Prediction_SF06h/functions
 export rest_path="/work/${USER}/tmp/"${Prediction_expPrefix} #folder where data to be branched are temporarly stored
 HPChost=`echo $HOST | cut -c1-7`
 if [ "${HPChost}" == "hexagon" ]; then

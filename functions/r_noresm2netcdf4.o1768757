@@ -1,0 +1,14 @@
+--------------------------------------------------
+Begin PBS Epilogue hexagon.bccs.uib.no
+Date:             Thu Jun 25 23:20:37 CEST 2015
+Job ID:           1768757.sdb
+Username:         earnest
+Group:            earnest
+Job Name:         r_noresm2netcdf4
+Session:          22588
+Limits:           mppnodect=1,mppnppn=32,mppwidth=32,walltime=00:59:00
+Resources:        energy_used=0,walltime=00:03:11
+Queue:            small
+Account:          nn9039k
+End PBS Epilogue  Thu Jun 25 23:20:37 CEST 2015
+--------------------------------------------------
