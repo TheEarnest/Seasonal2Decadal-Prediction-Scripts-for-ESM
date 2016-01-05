@@ -1905,7 +1905,7 @@ if (masterproc) then
       write(iulog,*) '  mlschk: k = ',plev-k+1,k, plev, BLC_factor(plev-k+1)
 endif
       if (BLC_factor(plev-k+1) > -1e-8_r8) then
-        met_rlx(k) = BLC_factor(plev-k+1)
+        met_rlx(k) = BLC_factor(plev-k+1)*max_rlx
 if (masterproc) then
         write(iulog,fmt=996) 'mlschk: ', met_rlx(k)
 endif

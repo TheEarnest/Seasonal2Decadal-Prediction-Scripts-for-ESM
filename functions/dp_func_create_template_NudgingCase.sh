@@ -76,7 +76,7 @@ sed -i s/"finidat".*/"finidat = '${ens_casename}01.clm2.r.${ens_start_date}.nc' 
 sed -i s/"ice_ic".*/"ice_ic     = '${ens_casename}01.cice.r.${ens_start_date}.nc'"/g cice.buildnml.csh
 insertLN=`grep -n "nhtfrq" cam.buildnml.csh | awk -F ":" '{print $1}' `
 
-cp ${HOMEDIR}/Script/functions/CAML26_nudging_namelist CAML26_nudging_namelist
+cp ${funcPath}/CAML26_nudging_namelist CAML26_nudging_namelist
 yyCAM=`echo ${start_date} | awk -F "-" '{print $1}'`
 mmCAM=`echo ${start_date} | awk -F "-" '{print $2}'`
 sed -i s/"#nuYEAR"/"${yyCAM}"/g CAML26_nudging_namelist
@@ -87,10 +87,10 @@ sed -i s/"#nuPath"/"${met_path}"/g CAML26_nudging_namelist
 sed -i s/"#CAM_Max_rlx"/"${CAM_Max_rlx}"/g CAML26_nudging_namelist
 
 sed -i "${insertLN} r CAML26_nudging_namelist" cam.buildnml.csh
-cp ${HOMEDIR}/Script/functions/CAMnudging_metdata.F90 ${nudcaseDIR}/${VERSION01}/SourceMods/src.cam/metdata.F90
-cp ${HOMEDIR}/Script/functions/CAMnudging_cam_comp.F90 ${nudcaseDIR}/${VERSION01}/SourceMods/src.cam/cam_comp.F90
+cp ${funcPath}/CAMnudging_metdata.F90 ${nudcaseDIR}/${VERSION01}/SourceMods/src.cam/metdata.F90
+cp ${funcPath}/CAMnudging_cam_comp.F90 ${nudcaseDIR}/${VERSION01}/SourceMods/src.cam/cam_comp.F90
 
-cp ${HOMEDIR}/Script/functions/CAMnudging_runtime_opts.F90 ${nudcaseDIR}/${VERSION01}/SourceMods/src.cam/runtime_opts.F90
+cp ${funcPath}/CAMnudging_runtime_opts.F90 ${nudcaseDIR}/${VERSION01}/SourceMods/src.cam/runtime_opts.F90
 
 # 
 ############################################################################

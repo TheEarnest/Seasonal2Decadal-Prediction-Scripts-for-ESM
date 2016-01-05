@@ -6,7 +6,7 @@ mm=${M_mm}; yr=${M_yr}
 # re-build template nudging case
 #------------------------------------------------------------------------
 temp_dateS=`date`
-#  . ${funcPath}/dp_func_create_template_NudgingCase.sh
+  . ${funcPath}/dp_func_create_template_NudgingCase.sh
 echo ${temp_dateS}
 echo `date`
 #########################################################################

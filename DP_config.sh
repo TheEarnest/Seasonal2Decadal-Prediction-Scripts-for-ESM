@@ -6,7 +6,7 @@
 Prediction_expPrefix="FFSTtest"
 REST_CaseName="NorCPM_F19_tn21_mem"
 Pred_CasePrefix="NorCPM_F19_tn21" # new prediction name 
-Prediction_start_date="01-15" # mm-dd
+Prediction_start_date="02-15" # mm-dd
 Prediction_length=6 # months
 Analysis_restart_months="01"
 Analysis_restart_day="15" # fixed by EnKF analysis

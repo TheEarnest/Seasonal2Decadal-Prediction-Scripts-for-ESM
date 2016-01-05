@@ -8,5 +8,5 @@
  met_max_rlx = #CAM_Max_rlx
  met_rlx_bot    = 50.
  met_rlx_top    = 60.
- met_BLC_factor = -1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.
+ met_BLC_factor = 0.,0.,0.,0.,0.,0.516,-1.,-1.,-1.,-1.
 
