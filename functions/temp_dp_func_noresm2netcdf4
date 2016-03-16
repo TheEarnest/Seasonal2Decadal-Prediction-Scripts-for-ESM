@@ -9,6 +9,19 @@
 #PBS -S /bin/bash
 #PBS -V
 
+#
+${DebugSetting}
+JobStartTime=`date`
+JobName='temp_dp_func_noresm2netcdf4'
+# 
+echo ${LinnBreaker}
+echo ${LinnBreaker}
+echo "Starting "${JobName}" ...... "
+
+tempPrefix=t_'temp_dp_func_noresm2netcdf4'
+###############################################################################
+
+
 Sdate=`date`
 set -ex
 nthreads=32
@@ -94,3 +107,12 @@ wait
 echo "${sn}: conversion completed."
 echo ${Sdate}
 date
+
+
+###############################################################################
+echo ${JobStartTime}
+echo `date`" || "${JobName}
+echo ${LinnBreaker}
+
+
+

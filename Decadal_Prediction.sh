@@ -21,7 +21,6 @@ for M_year in ${Prediction_years}; do
   . ${funcPath}/dp_func_naming_configuration
   ${funcPath}/dp_func_check_job_Status "RES"
   ${funcPath}/dp_func_check_job_Status "CRE"
-
   if [ ! -d ${WORKDIR}/../Logs ]; then
     mkdir -p ${WORKDIR}/../Logs
   fi
@@ -47,6 +46,7 @@ for M_year in ${Prediction_years}; do
   # Atmosphere nudging step in
   #------------------------------------------------------------------------
   if [ "${is_FOFA}" == "0" ]; then 
+    echo "Start nudging run ..."
     . ${funcPath}/dp_func_atmosphere_nudging_only
   else
     echo "Configuration is not finished yet ...  "
@@ -54,7 +54,6 @@ for M_year in ${Prediction_years}; do
     . ${funcPath}/dp_func_atmosphere_nudging_with_EnKF_SST
   fi
 
-exit 57    
   #########################################################################
   # Launch NorESM prediction 
   #------------------------------------------------------------------------
@@ -64,6 +63,7 @@ done # for prediction years
 ###############################################################################
 # 
 #------------------------------------------------------------------------------
+set +x
 if [ "${is_revisiting_jobs}" == "1" ]; then
   . ${funcPath}/dp_func_revisiting_jobs
 fi

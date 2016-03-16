@@ -5,13 +5,13 @@
 #
 ${DebugSetting}
 JobStartTime=`date`
-JobName=ps_func_template
+JobName='dp_func_naming_configuration'
 # 
 echo ${LinnBreaker}
 echo ${LinnBreaker}
 echo "Starting "${JobName}" ...... "
 
-tempPrefix=t_'ps_func_template'
+tempPrefix=t_'dp_func_naming_configuration'
 ###############################################################################
   export M_yr=`echo 000${M_year} | tail -5c`
   export M_month=`echo ${Prediction_start_date} | awk -F "-" '{print $1}' `
@@ -32,7 +32,12 @@ tempPrefix=t_'ps_func_template'
   if [ ! -d ${ARCHIVE} ]; then mkdir -p ${ARCHIVE}; fi
   if [ ! -d ${ConversionDIR} ]; then mkdir -p ${ConversionDIR}; fi
   sed -i s/"CASEDIR=".*/"CASEDIR=NorCPM_${CaseConfig}"/g ${NorCPM_config}
+  sed -i s/"ens_casename=".*/"ens_casename=${REST_CaseName}"/g ${NorCPM_config}
+  sed -i s/"mainfuncpath=".*/"mainfuncpath=${pathStr}"/g ${NorCPM_config} 
   sed -i s/"CASEDIR=".*/"CASEDIR=NorCPM_${CaseConfig}"/g ${CAMnudging_config}
+  sed -i s/"ens_casename=".*/"ens_casename=${REST_CaseName}"/g ${CAMnudging_config}
+  sed -i s/"mainfuncpath=".*/"mainfuncpath=${pathStr}"/g ${CAMnudging_config}
+
 
 ###############################################################################
 echo ${JobStartTime}

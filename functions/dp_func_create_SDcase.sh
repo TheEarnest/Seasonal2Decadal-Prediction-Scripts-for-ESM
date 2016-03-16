@@ -3,13 +3,13 @@
 #
 ${DebugSetting}
 JobStartTime=`date`
-JobName=ps_func_template
+JobName='dp_func_create_SDcase.sh'
 # 
 echo ${LinnBreaker}
 echo ${LinnBreaker}
 echo "Starting "${JobName}" ...... "
 
-tempPrefix=t_'ps_func_template'
+tempPrefix=t_'dp_func_create_SDcase.sh'
 ###############################################################################
 
 
@@ -50,7 +50,10 @@ if [ "${mem}" == "${firstmem}" ]; then
   xmlchange -file env_run.xml -id STOP_N -val ${nudging_period}
   xmlchange -file env_run.xml -id RESUBMIT -val 0
   xmlchange -file env_run.xml -id RESTART -val 0
-  xmlchange -file env_conf.xml -id CAM_CONFIG_OPTS -val '-phys cam4 -scen_rcp rcp85 -offline_dyn ' 
+
+  org_CAM_CONFIG_OPTS=`grep CAM_CONFIG_OPTS  env_conf.xml | awk -F "value=\"" '{print $2}' | awk -F "\" " '{print  $1}'`
+  new_CAM_CONFIG_OPTS=${org_CAM_CONFIG_OPTS}" -offline_dyn "
+  xmlchange -file env_conf.xml -id CAM_CONFIG_OPTS -val "${new_CAM_CONFIG_OPTS}"
   xmlchange -file env_run.xml -id CONTINUE_RUN -val FALSE
   #xmlchange -file env_conf.xml -id RUN_TYPE -val hybrid
   xmlchange -file env_conf.xml -id RUN_TYPE -val branch
@@ -80,8 +83,8 @@ if [ "${mem}" == "${firstmem}" ]; then
   sed -i s/" IDATE0   =".*/" IDATE0   = "${micom_IDATE0}/g micom.buildnml.csh
   sed -i s/" RSTCMP   =".*/" RSTCMP   = 0"/g micom.buildnml.csh
   sed -i s/"mfilt".*/"mfilt     = 1"/g cam.buildnml.csh
-  sed -i s/"nhtfrq".*/"nhtfrq    = 0"/g cam.buildnml.csh
-  #sed -i s/"nhtfrq".*/"nhtfrq    = -24"/g cam.buildnml.csh
+  #sed -i s/"nhtfrq".*/"nhtfrq    = 0"/g cam.buildnml.csh
+  sed -i s/"nhtfrq".*/"nhtfrq    = -24"/g cam.buildnml.csh
   sed -i s/" fincl2".*/"fincl2     = ' '"/g cam.buildnml.csh
   sed -i s/"ncdata".*/"ncdata = ${ens_casename}${firstmem}.cam2.i.${branched_ens_date}.nc "/g cam.input_data_list
   sed -i s/"ncdata".*/"ncdata     = '${ens_casename}${firstmem}.cam2.i.${branched_ens_date}.nc'"/g cam.buildnml.csh
@@ -90,7 +93,7 @@ if [ "${mem}" == "${firstmem}" ]; then
   sed -i s/"ice_ic".*/"ice_ic     = '${ens_casename}${firstmem}.cice.r.${ens_start_date}.nc'"/g cice.buildnml.csh
   insertLN=`grep -n "nhtfrq" cam.buildnml.csh | awk -F ":" '{print $1}' `
 
-  cp ${HOMEDIR}/Script/functions/CAML26_nudging_namelist CAML26_nudging_namelist
+  cp ${mainfuncpath}/CAML26_nudging_namelist CAML26_nudging_namelist
   yyCAM=`echo ${start_date} | awk -F "-" '{print $1}'`
   mmCAM=`echo ${start_date} | awk -F "-" '{print $2}'`
   sed -i s/"#nuYEAR"/"${yyCAM}"/g CAML26_nudging_namelist
@@ -101,10 +104,10 @@ if [ "${mem}" == "${firstmem}" ]; then
   sed -i s/"#CAM_Max_rlx"/"${CAM_Max_rlx}"/g CAML26_nudging_namelist
 
   sed -i "${insertLN} r CAML26_nudging_namelist" cam.buildnml.csh
-  cp ${HOMEDIR}/Script/functions/CAMnudging_metdata.F90 ${caseDIR}/${VERSION}${firstmem}/SourceMods/src.cam/metdata.F90
-  cp ${HOMEDIR}/Script/functions/CAMnudging_cam_comp.F90 ${caseDIR}/${VERSION}${firstmem}/SourceMods/src.cam/cam_comp.F90
+  cp ${mainfuncpath}/CAMnudging_metdata.F90 ${caseDIR}/${VERSION}${firstmem}/SourceMods/src.cam/metdata.F90
+  cp ${mainfuncpath}/CAMnudging_cam_comp.F90 ${caseDIR}/${VERSION}${firstmem}/SourceMods/src.cam/cam_comp.F90
 
-  cp ${HOMEDIR}/Script/functions/CAMnudging_runtime_opts.F90 ${caseDIR}/${VERSION}${firstmem}/SourceMods/src.cam/runtime_opts.F90
+  cp ${mainfuncpath}/CAMnudging_runtime_opts.F90 ${caseDIR}/${VERSION}${firstmem}/SourceMods/src.cam/runtime_opts.F90
 
 
   cd ${caseDIR}/${VERSION}${firstmem}/
@@ -117,7 +120,6 @@ if [ "${mem}" == "${firstmem}" ]; then
   echo `date`
 
   cd ${WORKDIR}/${VERSION}${firstmem}/run
-
 # -----------------------------------------------------------------------
 else
 echo "Prepare the rest of the members"
@@ -161,10 +163,10 @@ echo "Prepare the rest of the members"
    sed -i s/"PBS -l walltime".*/"PBS -l walltime=00:59:00"/g ${VERSION}${mem}.${machine}.run
 
    echo 'Now setting up the work dir'
-   cp ${HOMEDIR}/Script/functions/CAMnudging_metdata.F90 ${caseDIR}/${VERSION}${mem}/SourceMods/src.cam/metdata.F90
-   cp ${HOMEDIR}/Script/functions/CAMnudging_cam_comp.F90 ${caseDIR}/${VERSION}${mem}/SourceMods/src.cam/cam_comp.F90
+   cp ${mainfuncpath}/CAMnudging_metdata.F90 ${caseDIR}/${VERSION}${mem}/SourceMods/src.cam/metdata.F90
+   cp ${mainfuncpath}/CAMnudging_cam_comp.F90 ${caseDIR}/${VERSION}${mem}/SourceMods/src.cam/cam_comp.F90
 
-   cp ${HOMEDIR}/Script/functions/CAMnudging_runtime_opts.F90 ${caseDIR}/${VERSION}${mem}/SourceMods/src.cam/runtime_opts.F90
+   cp ${mainfuncpath}/CAMnudging_runtime_opts.F90 ${caseDIR}/${VERSION}${mem}/SourceMods/src.cam/runtime_opts.F90
 
    cd ${WORKDIR}/${VERSION}${mem}
    rm -rf atm cpl glc ice lib lnd ocn ccsm mct csm_share pio
@@ -265,13 +267,13 @@ fi
 #
 ${DebugSetting}
 JobStartTime=`date`
-JobName=ps_func_template
+JobName='dp_func_create_SDcase.sh'
 # 
 echo ${LinnBreaker}
 echo ${LinnBreaker}
 echo "Starting "${JobName}" ...... "
 
-tempPrefix=t_'ps_func_template'
+tempPrefix=t_'dp_func_create_SDcase.sh'
 ###############################################################################
 
 

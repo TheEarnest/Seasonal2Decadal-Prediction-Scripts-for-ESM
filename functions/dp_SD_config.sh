@@ -17,9 +17,11 @@ else
 fi
 VERSION=${CASEDIR}'_mem'
 
+mainfuncpath=/home/uib/earnest/Analysis/epocasa/Seasonal2Decadal-Prediction-Scripts-for-NorESM/functions
+
 #FOLLOWING is related to the starting option
 ens_start=1 #1 means we start hybrid from an ensemble run
-ens_casename='NorCPM_F19_tn21_mem'
+ens_casename=noresm1_ME_hist_s01_mem
 ens_start_date=1980-04-15-00000
 branched_ens_date=1980-01-01-00000
 hist_start=0 #1 means we start hybrid from anstorical run
