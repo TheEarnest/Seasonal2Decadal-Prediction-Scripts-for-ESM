@@ -1,6 +1,17 @@
 #!/bin/bash
 # 2015/01/15 by Mao-Lin Shen
-set -e
+#
+${DebugSetting}
+JobStartTime=`date`
+JobName=ps_func_template
+# 
+echo ${LinnBreaker}
+echo ${LinnBreaker}
+echo "Starting "${JobName}" ...... "
+
+tempPrefix=t_'ps_func_template'
+###############################################################################
+
 
 . ${CAMnudging_config}
 start_date=${the_start_date}
@@ -249,4 +260,19 @@ fi
 #                 'LHFLX','PRECC','PRECL','PRECSC','PRECSL','SHFLX',        
 #                 'PS:I','QREFHT:I','TREFHT:I','TS:I'        
 #                  /
+
+
+#
+${DebugSetting}
+JobStartTime=`date`
+JobName=ps_func_template
+# 
+echo ${LinnBreaker}
+echo ${LinnBreaker}
+echo "Starting "${JobName}" ...... "
+
+tempPrefix=t_'ps_func_template'
+###############################################################################
+
+
 #

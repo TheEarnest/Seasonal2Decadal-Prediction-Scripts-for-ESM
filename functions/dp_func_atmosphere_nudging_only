@@ -18,8 +18,10 @@ mm=${M_mm}; yr=${M_yr}
 # re-build template nudging case
 #------------------------------------------------------------------------
 temp_dateS=`date`
+nudExecutable=`readlink -f ${WORKDIR}/../${Nudging_Exec_templet_CaseName}/${Nudging_Exec_templet_CaseName}.ccsm.exe `
+if [ ! -f ${nudExecutable} ]; then
   . ${funcPath}/dp_func_create_template_NudgingCase.sh
-
+fi
 echo ${temp_dateS}
 echo `date`
 #########################################################################
@@ -38,6 +40,7 @@ for mem in ${Prediction_ensembles} ; do
   if [ "${CStatus}" == "None" ]; then
     . ${funcPath}/dp_func_clear_old_archive
     . ${funcPath}/dp_func_prepare_nudging_cases
+exit 777
     #--------------------------------------------------------------------  
       echo ${prefix_mem}"_"${mem}" "${prefix_Pyear}"_"${yr}" "${prefix_Pmonth}"_"${mm}" "${prefix_DAocean}"_Done" >> ${Prediction_sys_log}
   fi # end of creating nudging cases
