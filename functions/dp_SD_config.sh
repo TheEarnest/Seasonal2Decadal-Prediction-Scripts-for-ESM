@@ -2,12 +2,13 @@
 # 2015/01/15 by Mao-Lin Shen
 
 Ensembles='2 3'
-CASEDIR='noresm1_ME_hist_p01'
-if [ "$CASEDIR" == "NorCPM_ME" ] ; then
+CaseConfig=ME
+CASEDIR=NorCPM_ME
+if [ "${CaseConfig}" == "ME" ] ; then
   GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/gx1v6/20101119/grid.nc
   COMPSET=N20TREXTAERCN
   RES=f19_g16 
-elif [ "$CASEDIR" == "SDNorCPM_F19tn21" ] ; then
+elif [ "${CaseConfig}" == "F19tn21" ] ; then
   GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/tnx2v1/20130206/grid.nc
   COMPSET=N20TREXT
   RES=f19_tn21 

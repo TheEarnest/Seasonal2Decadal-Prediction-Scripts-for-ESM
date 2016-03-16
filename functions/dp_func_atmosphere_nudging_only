@@ -18,7 +18,7 @@ mm=${M_mm}; yr=${M_yr}
 # re-build template nudging case
 #------------------------------------------------------------------------
 temp_dateS=`date`
-nudExecutable=`readlink -f ${WORKDIR}/../${Nudging_Exec_templet_CaseName}/${Nudging_Exec_templet_CaseName}.ccsm.exe `
+nudExecutable=`readlink -f ${WORKDIR}/../${Nudging_Exec_templet_CaseName}/${Nudging_Exec_templet_CaseName}.ccsm.exe `  || nudExecutable="None"
 if [ ! -f ${nudExecutable} ]; then
   . ${funcPath}/dp_func_create_template_NudgingCase.sh
 fi
@@ -40,6 +40,7 @@ for mem in ${Prediction_ensembles} ; do
   if [ "${CStatus}" == "None" ]; then
     . ${funcPath}/dp_func_clear_old_archive
     . ${funcPath}/dp_func_prepare_nudging_cases
+exit 588
     #--------------------------------------------------------------------  
       echo ${prefix_mem}"_"${mem}" "${prefix_Pyear}"_"${yr}" "${prefix_Pmonth}"_"${mm}" "${prefix_DAocean}"_Done" >> ${Prediction_sys_log}
   fi # end of creating nudging cases
@@ -58,10 +59,10 @@ for mem in ${Prediction_ensembles} ; do
     is_job_submitted=0
     while (( ! ${is_job_submitted} )); do
       cd ${caseDIR}/${Pred_CasePrefix}_mem${mem} 
-      checkfile=${Pred_CasePrefix}_mem${mem}.micom.r.${yr}-${mm}-${dd}-00000.nc
+      checkfile=${REST_CaseName}${mem}.micom.r.${yr}-${mm}-${dd}-00000.nc
       checkfile1=${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/${checkfile}
       checkfile2=${rest_path}/${Pred_CasePrefix}_mem${mem}/rest/${yr}-${mm}-${dd}-00000/${checkfile}
-      nudcheckfile=${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/${Pred_CasePrefix}_mem${mem}.cam2.r.${yr}-${mm}-${dd}-00000.nc
+      nudcheckfile=${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/${REST_CaseName}${mem}.cam2.r.${yr}-${mm}-${dd}-00000.nc
       if [ -f ${nudcheckfile} ]; then
         nudRestCheck=`ncdump -h ${nudcheckfile} | grep current_metdata_filename` || nudRestCheck="None"
         if [ "${nudRestCheck}" == "None" ]; then
@@ -81,6 +82,7 @@ for mem in ${Prediction_ensembles} ; do
           sleep 5
         fi
       fi
+      #mail -s "`date`: " earnestshen@gmail.com <<< 'as title ...  '
       sleep 0.5s
     done
 # log submit status
@@ -90,7 +92,7 @@ for mem in ${Prediction_ensembles} ; do
     sleep 5
   fi
 done
-
+exit 6
 #########################################################################
 # Monitoring the run
 #------------------------------------------------------------------------
@@ -106,7 +108,7 @@ elif [ "${nudging_base}" == "y" ]; then
   NewDate=${TYear}-${mm}-${dd}
 fi
 
-set -e
+${DebugSetting}
 is_CAMnudging_finished=1
 for im in ${Prediction_ensembles}; do
   mem=`echo 00${im} | tail -c3 `

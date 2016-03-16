@@ -31,14 +31,13 @@ tempPrefix=t_'dp_func_naming_configuration'
   if [ ! -d ${WORKDIR} ]; then mkdir -p ${WORKDIR}; fi
   if [ ! -d ${ARCHIVE} ]; then mkdir -p ${ARCHIVE}; fi
   if [ ! -d ${ConversionDIR} ]; then mkdir -p ${ConversionDIR}; fi
-  sed -i s/"CASEDIR=".*/"CASEDIR=NorCPM_${CaseConfig}"/g ${NorCPM_config}
-  sed -i s/"ens_casename=".*/"ens_casename=${REST_CaseName}"/g ${NorCPM_config}
-  sed -i s/"mainfuncpath=".*/"mainfuncpath=${pathStr}"/g ${NorCPM_config} 
-  sed -i s/"CASEDIR=".*/"CASEDIR=NorCPM_${CaseConfig}"/g ${CAMnudging_config}
-  sed -i s/"ens_casename=".*/"ens_casename=${REST_CaseName}"/g ${CAMnudging_config}
-  sed -i s/"mainfuncpath=".*/"mainfuncpath=${pathStr}"/g ${CAMnudging_config}
-
-
+  configFiles=" ${NorCPM_config} ${CAMnudging_config}"
+  for configFile in ${configFiles}; do 
+    sed -i s/"CASEDIR=".*/"CASEDIR=NorCPM_${CaseConfig}"/g ${configFile}
+    sed -i s/"ens_casename=".*/"ens_casename=${REST_CaseName}"/g ${configFile}
+    sed -i s/"mainfuncpath=".*/"mainfuncpath=${pathStr}"/g ${configFile} 
+    sed -i s/"CaseConfig=".*/"CaseConfig=${CaseConfig}"/g ${configFile}
+  done
 ###############################################################################
 echo ${JobStartTime}
 echo `date`" || "${JobName}

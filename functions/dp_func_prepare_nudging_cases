@@ -1,7 +1,7 @@
 #! /bin/bash
 # 2015/01/15 by Mao-Lin Shen
 set -e
-copy="ln -sf "
+copy="cp -rf  "
 mm=${M_mm}; yr=${M_yr}
 # modify $CAMnudging_config  "dp_SD_config.sh" in NorCPM    
 sed -i s/"CASEDIR=".*/"CASEDIR=\'${Pred_CasePrefix}\'"/g ${CAMnudging_config}

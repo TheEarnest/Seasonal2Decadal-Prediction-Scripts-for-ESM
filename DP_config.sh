@@ -75,7 +75,7 @@ export Log_Prefix=${Prediction_expPrefix}"_iOA"${is_FOFA}"_pn"${nudging_length}"
 export Prediction_Prefix=${Pred_CasePrefix}
   (( Prediction_months = Prediction_length + 1 ))
 export Prediction_months=${Prediction_months}
-
+export LinnBreaker="--------------------------------------------------------"
 #########################################################################
 # for system log
 #------------------------------------------------------------------------

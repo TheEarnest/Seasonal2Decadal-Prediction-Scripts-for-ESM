@@ -11,11 +11,12 @@ echo "Starting "${JobName}" ...... "
 
 tempPrefix=t_'dp_func_create_SDcase.sh'
 ###############################################################################
-
+set -ex
 
 . ${CAMnudging_config}
 start_date=${the_start_date}
 
+exit 666
 #This script will create an ensemble of Noresm for atmosphere nudging 
 # 2015/01/15 by Mao-Lin Shen
 let tmp_date=hist_start_date+hist_freq_date
