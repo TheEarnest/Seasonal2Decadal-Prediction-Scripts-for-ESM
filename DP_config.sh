@@ -58,8 +58,8 @@ fi
 
 export NorCPM_config=${funcPath}"/dp_NorCPM_config.sh"
 export CAMnudging_config=${funcPath}"/dp_SD_config.sh"
-export Nudging_Exec_templet_CaseName="nudged_NorESM_F19tn21_template_mem01"
-export Normal_Exec_templet_CaseName="normal_NorCPM_F19tn21_template_mem01"
+export Nudging_Exec_templet_CaseName="nudged_NorESM_${CaseConfig}_template_mem01"
+export Normal_Exec_templet_CaseName="normal_NorCPM_${CaseConfig}_template_mem01"
 export python=`which python`
 Pmm=`echo ${Prediction_start_date} | cut -c1-2`
 Pdd=`echo ${Prediction_start_date} | tail -c3 `

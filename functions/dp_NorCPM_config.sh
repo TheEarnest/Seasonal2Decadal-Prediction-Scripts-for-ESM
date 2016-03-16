@@ -1,6 +1,6 @@
 # 2015/01/15 by Mao-Lin Shen
 set -e
-CASEDIR='NorCPM_F19_tn21'
+CASEDIR=NorCPM_ME
 Ensembles='1'
 #dailymicom=yes
 if [ "$CASEDIR" == "NorCPM_ME" ] ; then

@@ -4,8 +4,8 @@ set -e
 
 . ${CAMnudging_config}
 ENSSIZE=1
-CASEDIR="nudged_NorESM_${CaseConfig}_template"
-VERSION01=${CASEDIR}'_mem01'
+CASEDIR=`echo ${Nudging_Exec_templet_CaseName} | awk -F "_mem" '{print $1}'`
+VERSION01=${Nudging_Exec_templet_CaseName}
 start_date=${the_start_date}
 nudcaseDIR=`readlink -f ${caseDIR}/../ `
 nudWORKDIR=`readlink -f ${WORKDIR}/../ `
@@ -41,7 +41,9 @@ fi
 xmlchange -file env_run.xml -id STOP_N -val ${nudging_period}
 xmlchange -file env_run.xml -id RESUBMIT -val 0
 xmlchange -file env_run.xml -id RESTART -val 0
-xmlchange -file env_conf.xml -id CAM_CONFIG_OPTS -val '-phys cam4 -scen_rcp rcp85 -offline_dyn ' 
+org_CAM_CONFIG_OPTS=`grep CAM_CONFIG_OPTS  env_conf.xml | awk -F "value=\"" '{print $2}' | awk -F "\" " '{print  $1}'`
+new_CAM_CONFIG_OPTS=${org_CAM_CONFIG_OPTS}" -offline_dyn "
+xmlchange -file env_conf.xml -id CAM_CONFIG_OPTS -val "${new_CAM_CONFIG_OPTS}" 
 xmlchange -file env_run.xml -id CONTINUE_RUN -val FALSE
 #xmlchange -file env_conf.xml -id RUN_TYPE -val hybrid
 xmlchange -file env_conf.xml -id RUN_TYPE -val branch

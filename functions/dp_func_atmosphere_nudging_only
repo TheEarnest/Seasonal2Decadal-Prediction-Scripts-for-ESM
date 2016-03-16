@@ -1,13 +1,25 @@
 #! /bin/bash
 # 2015/01/21 by Mao-Lin Shen
-set -e
+#
+${DebugSetting}
+JobStartTime=`date`
+JobName=ps_func_template
+# 
+echo ${LinnBreaker}
+echo ${LinnBreaker}
+echo "Starting "${JobName}" ...... "
+
+tempPrefix=t_'ps_func_template'
+###############################################################################
+
+
 mm=${M_mm}; yr=${M_yr}
 #########################################################################
 # re-build template nudging case
 #------------------------------------------------------------------------
 temp_dateS=`date`
   . ${funcPath}/dp_func_create_template_NudgingCase.sh
-exit 55
+
 echo ${temp_dateS}
 echo `date`
 #########################################################################
@@ -134,4 +146,11 @@ while (( ! ${is_CAMnudging_finished} )); do
     sleep 60
   fi
 done
+
+
+###############################################################################
+echo ${JobStartTime}
+echo `date`" || "${JobName}
+echo ${LinnBreaker}
+
 
