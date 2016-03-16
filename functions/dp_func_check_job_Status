@@ -3,8 +3,21 @@
 #########################################################################
 # check prediction status. Base on the assigned argument    
 #------------------------------------------------------------------------
+#
+ . ${funcPath}/../DP_config.sh 
+#
+${DebugSetting}
+JobStartTime=`date`
+JobName=ps_func_template
+# 
+echo ${LinnBreaker}
+echo ${LinnBreaker}
+echo "Starting "${JobName}" ...... "
 
-  . ${funcPath}/../DP_config.sh 
+tempPrefix=t_'ps_func_template'
+###############################################################################
+
+
 
 set -e
 if [[ -n $1 ]] ; then
@@ -56,15 +69,14 @@ fi
 # check "cases" & sys_log to confirm the status of cases    
 #------------------------------------------------------------------------
 if [ "${is_check_CRE}" == "1" ]; then
-  predicCdir=/work/${USER}/Conversion/${Prediction_CaseName}
-  if [ ! -d ${predicCdir} ]; then
-    mkdir -p ${predicCdir}
+  if [ ! -d ${ConversionDIR} ]; then
+    mkdir -p ${ConversionDIR}
   fi
-  predicLog=${funcPath}/sys_dp_${Prediction_CaseName}
+  predicLog=${funcPath}/syslog_dp_${Log_Prefix}
   if [ ! -f ${Prediction_sys_log} ]; then
     echo "Member Year Month DA_Ocean nudATM Prediction" > ${Prediction_sys_log}
   fi
-  rm ${funcPath}/sys_dp_* || echo "No old log files left ... "
+  rm ${funcPath}/syslog_dp_* || echo "No old log files left ... "
   ln -sf ${Prediction_sys_log} ${predicLog}
 fi
 
@@ -79,4 +91,10 @@ fi
 if [ "${is_check_RUN}" == "1" ]; then
   echo ${is_check_DAO}
 fi
+
+
+###############################################################################
+echo ${JobStartTime}
+echo `date`" || "${JobName}
+echo ${LinnBreaker}
 

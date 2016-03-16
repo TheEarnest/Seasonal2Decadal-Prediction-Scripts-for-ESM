@@ -1,0 +1,40 @@
+#! /bin/bash
+###############################################################################
+# ensemble info
+#------------------------------------------------------------------------------
+#
+${DebugSetting}
+JobStartTime=`date`
+JobName=ps_func_template
+# 
+echo ${LinnBreaker}
+echo ${LinnBreaker}
+echo "Starting "${JobName}" ...... "
+
+tempPrefix=t_'ps_func_template'
+###############################################################################
+  export M_yr=`echo 000${M_year} | tail -5c`
+  export M_month=`echo ${Prediction_start_date} | awk -F "-" '{print $1}' `
+  export M_day=`echo ${Prediction_start_date} | awk -F "-" '{print $2}' `
+  export Prediction_CaseName=${Prediction_Prefix}
+  export Prediction_ParentPath=${Prediction_Prefix}/${M_year}${M_month}${M_day}
+  export M_mm=${Analysis_restart_months}
+  export M_dd=${Analysis_restart_day}
+  year=${M_year}
+
+  export caseDIR=${HOMEDIR}/cases/${Prediction_ParentPath}
+  export WORKDIR=/work/${USER}/noresm/${Prediction_ParentPath}
+  export ARCHIVE=/work/${USER}/archive/${Prediction_ParentPath}
+  export ConversionDIR=/work/${USER}/Conversion/${Prediction_ParentPath}
+  export Prediction_sys_log=${ConversionDIR}/"syslog_dp_"${Log_Prefix}
+
+
+###############################################################################
+echo ${JobStartTime}
+echo `date`" || "${JobName}
+echo ${LinnBreaker}
+
+
+
+
+

@@ -1,0 +1,18 @@
+#! /bin/bash
+#########################################################################
+cd ${funcPath}
+files=`ls --color=no *_func_*`
+for file in ${files}; do
+  if [ "${file}" != "ps_func_revisiting_jobs" ]; then
+    JobName=`grep "JobName=" ${file} | awk -F "=" '{print $NF}'`
+    if [ "${JobName}" != ${file} ]; then
+      sed -i s/"JobName=".*/"JobName=\'${file}\'"/g ${file}
+    fi
+    tempPrefix=`grep "tempPrefix=" ${file} | awk -F "=" '{print $NF}'`
+    if [ "${tempPrefix}" != ${file} ]; then
+      sed -i s/"tempPrefix=".*/"tempPrefix=t_\'${file}\'"/g ${file}
+    fi
+  fi 
+done
+
+

@@ -3,44 +3,29 @@
 # for creating and monitoring decadal prediction run
 # 15/01/2015 Mao-Lin Shen, create the scripts
 #------------------------------------------------------------------------------
-set -ex
 scripthome=`pwd`
 pathStr=`echo ${scripthome}/functions | sed 's/\//\\\\\//g'`
 sed -i s/"funcPath=".*/"funcPath=${pathStr}"/g DP_config.sh
   . ${scripthome}/DP_config.sh
-set -e
 
+set -ex
 echo `date`
 
 ###############################################################################
 # Check and prepare restart files
 #------------------------------------------------------------------------------
-set -e 
 ###############################################################################
 # Prediction start   
 #------------------------------------------------------------------------------
-set -e 
 for M_year in ${Prediction_years}; do
-  export M_yr=`echo 000${M_year} | tail -5c`
-  export M_month=${Analysis_restart_months}
-  export Prediction_CaseName=${Prediction_Prefix}"_pM"${M_month}"_pY"${M_year}
-  export M_mm=${M_month}
-  export M_dd=${Analysis_restart_day}
-  year=${M_year}
-
-  export caseDIR=${HOMEDIR}/cases/${Prediction_CaseName}
-  export WORKDIR=/work/${USER}/noresm/${Prediction_CaseName}
-  export ARCHIVE=/work/${USER}/archive/${Prediction_CaseName}
-  export ConversionDIR=/work/${USER}/Conversion/${Prediction_CaseName}
-  export Prediction_sys_log=${ConversionDIR}/"sys_dp_"${Prediction_CaseName}
-
+  . ${funcPath}/dp_func_naming_standard
   ${funcPath}/dp_func_check_job_Status "RES"
   ${funcPath}/dp_func_check_job_Status "CRE"
 
   if [ ! -d ${WORKDIR}/Logs ]; then
     mkdir -p ${WORKDIR}/Logs
   fi
-
+exit 5
   #########################################################################
   # check prediction start months and restart file month   
   #------------------------------------------------------------------------
@@ -82,5 +67,9 @@ done # for prediction years
 ###############################################################################
 # 
 #------------------------------------------------------------------------------
+if [ "${is_revisiting_jobs}" == "1" ]; then
+  . ${funcPath}/dp_func_revisiting_jobs
+fi
+
 echo " Prediction integration is finished. "
 

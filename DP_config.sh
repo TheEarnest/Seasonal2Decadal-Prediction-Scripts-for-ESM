@@ -1,11 +1,11 @@
 #! /bin/bash
-
+mailto="earnestshen@gmail.com"
 #########################################################################
 # Configurations for decadal prediction 
 #------------------------------------------------------------------------
-Prediction_expPrefix="FFSTtest"
+Prediction_expPrefix="FFtest1" # for user only 
 REST_CaseName="noresm1_ME_hist_s01_mem"
-Pred_CasePrefix="noresm1_ME_hist_p01" # new prediction name 
+Pred_CaseSuffix="p01" # new prediction name 
 Prediction_start_date="05-01" # mm-dd
 Prediction_length=12 # months
 Analysis_restart_months="04"
@@ -34,12 +34,14 @@ ens_casename=${REST_CaseName}
 #########################################################################
 # All background configuration 
 #------------------------------------------------------------------------
+export CaseModel=noresm1
+export CaseForcing=hist
+export CaseConfig=ME
+Pred_CasePrefix=${CaseModel}"_"${CaseConfig}"_"${CaseForcing}"_"${Pred_CaseSuffix} # new prediction name 
 export CPUACCOUNT=nn9039k
 export CODEVERSION='projectEPOCASA-7/noresm/'
 REST_months="01 02 05 08 11"
 export HOMEDIR=${HOME}/NorESM
-#export WORKDIR=/work/${USER}/noresm
-#export ARCHIVE=/work/${USER}/archive
 # funcPath will be updated by the main script automatically ...
 export funcPath=/home/uib/earnest/Analysis/epocasa/Seasonal2Decadal-Prediction-Scripts-for-NorESM/functions
 export rest_path="/work/${USER}/tmp/"${Prediction_expPrefix} #folder where data to be branched are temporarly stored
@@ -69,13 +71,16 @@ fi
 
 export nudging_length=${nudDays}"d" # d, day; m, month; y, year
 
-export Prediction_Prefix=${Prediction_expPrefix}"_iOA"${is_FOFA}"_pn"${nudging_length}"_pL"${Prediction_length}
+export Log_Prefix=${Prediction_expPrefix}"_iOA"${is_FOFA}"_pn"${nudging_length}"_pL"${Prediction_length}
+export Prediction_Prefix=${Pred_CasePrefix}
   (( Prediction_months = Prediction_length + 1 ))
 export Prediction_months=${Prediction_months}
 
 #########################################################################
 # for system log
 #------------------------------------------------------------------------
+DebugSetting="set -ex"
+is_revisiting_jobs=1
 export prefix_mem="mem"
 export prefix_Pyear="PSy"
 export prefix_Pmonth="PSm"
