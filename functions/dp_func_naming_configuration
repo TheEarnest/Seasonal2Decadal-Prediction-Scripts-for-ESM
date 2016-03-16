@@ -31,7 +31,8 @@ tempPrefix=t_'ps_func_template'
   if [ ! -d ${WORKDIR} ]; then mkdir -p ${WORKDIR}; fi
   if [ ! -d ${ARCHIVE} ]; then mkdir -p ${ARCHIVE}; fi
   if [ ! -d ${ConversionDIR} ]; then mkdir -p ${ConversionDIR}; fi
-
+  sed -i s/"CASEDIR=".*/"CASEDIR=NorCPM_${CaseConfig}"/g ${NorCPM_config}
+  sed -i s/"CASEDIR=".*/"CASEDIR=NorCPM_${CaseConfig}"/g ${CAMnudging_config}
 
 ###############################################################################
 echo ${JobStartTime}

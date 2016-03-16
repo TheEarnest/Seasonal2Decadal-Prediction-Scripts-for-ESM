@@ -18,23 +18,22 @@ echo `date`
 # Prediction start   
 #------------------------------------------------------------------------------
 for M_year in ${Prediction_years}; do
-  . ${funcPath}/dp_func_naming_standard
+  . ${funcPath}/dp_func_naming_configuration
   ${funcPath}/dp_func_check_job_Status "RES"
   ${funcPath}/dp_func_check_job_Status "CRE"
 
-  if [ ! -d ${WORKDIR}/Logs ]; then
-    mkdir -p ${WORKDIR}/Logs
+  if [ ! -d ${WORKDIR}/../Logs ]; then
+    mkdir -p ${WORKDIR}/../Logs
   fi
-exit 5
+
   #########################################################################
   # check prediction start months and restart file month   
   #------------------------------------------------------------------------
   is_restart_match=0
-  if [ "${M_month}" == "${Analysis_restart_months}" ]; then
+  if [ "${M_mm}" == "${Analysis_restart_months}" ]; then
     is_restart_match=1
   fi
 
-  set -e
   #########################################################################
   # rerun NorCPM if there is no restart files for prediction month
   #------------------------------------------------------------------------  
@@ -44,7 +43,6 @@ exit 5
     . ${funcPath}/dp_func_rerun_and_check_EnKF_SST
   fi
 
-  set -e
   #########################################################################
   # Atmosphere nudging step in
   #------------------------------------------------------------------------
@@ -55,13 +53,12 @@ exit 5
     exit
     . ${funcPath}/dp_func_atmosphere_nudging_with_EnKF_SST
   fi
-    
-  set -e
+
+exit 57    
   #########################################################################
   # Launch NorESM prediction 
   #------------------------------------------------------------------------
   . ${funcPath}/dp_func_Launch_prediction
-  done
 
 done # for prediction years
 ###############################################################################

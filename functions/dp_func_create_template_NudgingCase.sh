@@ -4,11 +4,11 @@ set -e
 
 . ${CAMnudging_config}
 ENSSIZE=1
-CASEDIR='nudged_NorESM_F19tn21_template'
+CASEDIR="nudged_NorESM_${CaseConfig}_template"
 VERSION01=${CASEDIR}'_mem01'
 start_date=${the_start_date}
-nudcaseDIR=${HOMEDIR}/cases
-nudWORKDIR=/work/${USER}/noresm
+nudcaseDIR=`readlink -f ${caseDIR}/../ `
+nudWORKDIR=`readlink -f ${WORKDIR}/../ `
 
 #This script will create an ensemble of Noresm for atmosphere nudging 
 # 2015/01/15 by Mao-Lin Shen

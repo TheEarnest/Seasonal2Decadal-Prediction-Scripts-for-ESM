@@ -2,20 +2,18 @@
 # 2015/01/15 by Mao-Lin Shen
 
 Ensembles='2'
-CASEDIR='NorCPM_F19_tn21'
-#CASEDIR='NorCPM_F19_tn21'
-FN_CASEDIR='NorCPM_F19_tn21'
+CASEDIR=NorCPM_ME
 if [ "$CASEDIR" == "NorCPM_ME" ] ; then
-   COMPSET=N20TREXTAERCN
-   RES=f19_g16 
+  GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/gx1v6/20101119/grid.nc
+  COMPSET=N20TREXTAERCN
+  RES=f19_g16 
 elif [ "$CASEDIR" == "SDNorCPM_F19tn21" ] ; then
-   COMPSET=N20TREXT
-   RES=f19_tn21 
+  GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/tnx2v1/20130206/grid.nc
+  COMPSET=N20TREXT
+  RES=f19_tn21 
 else
-   COMPSET=N20TREXT
-   RES=f19_tn21
-#else
-#   echo "$CASEDIR not implemented in NorCPM, we quit"
+  COMPSET=N20TREXT
+  RES=f19_tn21
 fi
 VERSION=${CASEDIR}'_mem'
 

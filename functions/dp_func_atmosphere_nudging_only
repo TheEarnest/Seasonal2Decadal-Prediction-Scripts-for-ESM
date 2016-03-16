@@ -7,6 +7,7 @@ mm=${M_mm}; yr=${M_yr}
 #------------------------------------------------------------------------
 temp_dateS=`date`
   . ${funcPath}/dp_func_create_template_NudgingCase.sh
+exit 55
 echo ${temp_dateS}
 echo `date`
 #########################################################################
