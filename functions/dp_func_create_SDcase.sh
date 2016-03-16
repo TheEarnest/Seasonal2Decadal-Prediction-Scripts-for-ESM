@@ -11,12 +11,10 @@ echo "Starting "${JobName}" ...... "
 
 tempPrefix=t_'dp_func_create_SDcase.sh'
 ###############################################################################
-set -ex
 
 . ${CAMnudging_config}
 start_date=${the_start_date}
 
-exit 666
 #This script will create an ensemble of Noresm for atmosphere nudging 
 # 2015/01/15 by Mao-Lin Shen
 let tmp_date=hist_start_date+hist_freq_date
@@ -79,7 +77,7 @@ if [ "${mem}" == "${firstmem}" ]; then
   cd ${caseDIR}/${VERSION}${firstmem}/Buildconf/
   micom_IDATE=`grep "IDATE    =" micom.buildnml.csh  | awk -F " " '{print $NF}'`
   micom_IDATE0=`grep "IDATE0   =" micom.buildnml.csh  | awk -F " " '{print $NF}'`
-  cp ${funcPath}/dp_NorESM_micom_buildnml_csh micom.buildnml.csh
+  cp ${funcPath}/dp_${CaseConfig}_NorESM_micom_buildnml_csh micom.buildnml.csh
   sed -i s/" IDATE    =".*/" IDATE    = "${micom_IDATE}/g micom.buildnml.csh
   sed -i s/" IDATE0   =".*/" IDATE0   = "${micom_IDATE0}/g micom.buildnml.csh
   sed -i s/" RSTCMP   =".*/" RSTCMP   = 0"/g micom.buildnml.csh
@@ -122,6 +120,8 @@ if [ "${mem}" == "${firstmem}" ]; then
 
   cd ${WORKDIR}/${VERSION}${firstmem}/run
 # -----------------------------------------------------------------------
+
+
 else
 echo "Prepare the rest of the members"
 #Prediction_ensembles_left=`echo ${Prediction_ensembles} | cut -c3-1000`

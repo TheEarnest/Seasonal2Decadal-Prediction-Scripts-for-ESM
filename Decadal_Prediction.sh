@@ -53,7 +53,6 @@ for M_year in ${Prediction_years}; do
     exit
     . ${funcPath}/dp_func_atmosphere_nudging_with_EnKF_SST
   fi
-
   #########################################################################
   # Launch NorESM prediction 
   #------------------------------------------------------------------------

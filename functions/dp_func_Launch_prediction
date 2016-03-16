@@ -1,6 +1,18 @@
 #! /bin/bash
 # 2015/01/21 by Mao-Lin Shen
-set -e
+#
+${DebugSetting}
+JobStartTime=`date`
+JobName='dp_func_template'
+#
+echo ${LinnBreaker}
+echo ${LinnBreaker}
+echo "Starting "${JobName}" ...... "
+
+tempPrefix=t_'dp_func_template'
+###############################################################################
+
+
 #########################################################################
 # double check if the jobs are all ready     
 # some should be skip if the job is finished!!!!.......
@@ -36,7 +48,7 @@ for im in ${Prediction_ensembles}; do
         echo "Re-check job status ................"
         exit
       fi
-      # duplicate restartddd files 
+      # duplicate restart files 
       echo "Dupplicate restart files for member "${mem}" ...  "
       sourceDIR=${ARCHIVE}/${REST_CaseName}${mem}/rest/${NewDate}-00000
       targetDIR1=${rest_path}/${REST_CaseName}${mem}/rest
@@ -71,7 +83,7 @@ sed -i s/"ARCHIVE=".*/"ARCHIVE=\'${ARCHIVEStr}\'"/g ${nc4Scriptfn}
 sed -i s/"VERSION=".*/"VERSION=\'${Pred_CasePrefix}_mem\'"/g ${nc4Scriptfn}
 sed -i s/"CONVERSION_FOLDER=".*/"CONVERSION_FOLDER=\'${FolderStr}\'"/g ${nc4Scriptfn}
 
-
+exit 777
 # export yr=`echo ${NewDate} | cut -c1-4 `
 # export mm=`echo ${NewDate} | cut -c6-7 `
 # export dd=`echo ${NewDate} | tail -c3 `
@@ -147,5 +159,12 @@ for mem in ${Prediction_ensembles} ; do
     sleep 5s
   fi
 done
+
+
+###############################################################################
+echo ${JobStartTime}
+echo `date`" || "${JobName}
+echo ${LinnBreaker}
+
 
 
