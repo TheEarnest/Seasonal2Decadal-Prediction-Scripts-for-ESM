@@ -11,9 +11,10 @@ Prediction_length=12 # months
 Analysis_restart_months="04"
 Analysis_restart_day="15" # fixed by EnKF analysis
 export CAM_Max_rlx=0.0020833333333333333 # maximum nudging coeff 
-is_FOFA=0; # Initializing ocean fist and follow up with atmosphere nudging ...
-#is_FOFA=1; # Initializing ocean and atmosphere together ...
-#is_FOFA=2; # Initializing ocean only ...
+#is_FOFA=0; # free forecast  
+is_FOFA=1; # Initializing ocean fist and follow up with atmosphere nudging ...
+#is_FOFA=2; # Initializing ocean and atmosphere together, for old analysis which we keep only forecast restart 
+#is_FOFA=3; # Initializing ocean only ...
 
 #########################################################################
 # For ensemble configuration 
@@ -27,7 +28,7 @@ RESTtar_path=/work/earnest/Conversion/noresm1_ME_hist_s01/analysis
 
 
 #Prediction_years=`seq 1991 2006`
-Prediction_years="1980"
+Prediction_years="1990"
 
 #FOLLOWING is related to the starting option
 ens_casename=${REST_CaseName}
@@ -38,7 +39,7 @@ export CaseModel=noresm1
 export CaseForcing=hist
 export CaseConfig=ME
 Pred_CasePrefix=${CaseModel}"_"${CaseConfig}"_"${CaseForcing}"_"${Pred_CaseSuffix} # new prediction name 
-export CPUACCOUNT=nn9039k
+export CPUACCOUNT=geofysisk
 export CODEVERSION='projectEPOCASA-7/noresm/'
 REST_months="01 02 05 08 11"
 export HOMEDIR=${HOME}/NorESM

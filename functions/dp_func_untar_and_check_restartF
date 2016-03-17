@@ -3,7 +3,19 @@
 #########################################################################
 # prepare restart files for NorESM
 #------------------------------------------------------------------------
-set -e
+#
+${DebugSetting}
+JobStartTime=`date`
+JobName='dp_func_template'
+#
+echo ${LinnBreaker}
+echo ${LinnBreaker}
+echo "Starting "${JobName}" ...... "
+
+tempPrefix=t_'dp_func_template'
+###############################################################################
+
+
 is_restart_files_ok=1
 #for im in ${EnKF_ensembles} ; do
 #  mem=`echo 0${im} | tail -3c`
@@ -47,3 +59,9 @@ is_restart_files_ok=1
 if [ "${is_restart_files_ok}" == "0" ]; then
   exit 1
 fi
+
+###############################################################################
+echo ${JobStartTime}
+echo `date`" || "${JobName}
+echo ${LinnBreaker}
+

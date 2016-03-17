@@ -1,5 +1,18 @@
 #!/bin/bash
-set -e
+#
+${DebugSetting}
+JobStartTime=`date`
+JobName='dp_func_template'
+#
+echo ${LinnBreaker}
+echo ${LinnBreaker}
+echo "Starting "${JobName}" ...... "
+
+tempPrefix=t_'dp_func_template'
+###############################################################################
+
+
+
 #This script will create an ensemble of folder of Noresm without duplicating Build directory.
 #Francois Counillon 6/10/2011
 . ${NorCPM_config}
@@ -8,9 +21,6 @@ start_date=${the_start_date}
 let tmp_date=hist_start_date+hist_freq_date
 hist_mem_date=`echo 000$tmp_date | tail -5c`
 hist_mem01_date=`echo 000$hist_start_date | tail -5c`
-#Generate the script to convert output to netcdf4
-cat ${WORKSHARED}/Input/NorESM/noresm2netcdf4_all.pbs_mal | sed "s/V.E.R.S.I.O.N/${VERSION}/" \
-| sed "s/E.N.S/${ENSSIZE}/" > ${HOMEDIR}/Script/noresm2netcdf4.pbs
 
 if [ "${mem}" == "${firstmem}" ]; then
 #Prepare member 1
@@ -26,8 +36,8 @@ xmlchange -file env_run.xml -id DOUT_S_ROOT -val ${ARCHIVE}/${VERSION}${firstmem
 
 
 xmlchange -file env_run.xml -id STOP_OPTION -val nmonth
-xmlchange -file env_run.xml -id STOP_N -val ${forecast_length}
-xmlchange -file env_run.xml -id RESUBMIT -val 0
+xmlchange -file env_run.xml -id STOP_N -val ${job_length}
+xmlchange -file env_run.xml -id RESUBMIT -val ${resubmit}
 xmlchange -file env_run.xml -id RESTART -val 0
  xmlchange -file env_run.xml -id CONTINUE_RUN -val FALSE
  xmlchange -file env_conf.xml -id RUN_TYPE -val branch
@@ -40,6 +50,11 @@ xmlchange -file env_run.xml -id RESTART -val 0
     xmlchange -file env_conf.xml -id BRNCH_RETAIN_CASENAME -val TRUE
  fi
 
+  templetePath=`readlink -f ${caseDIR}/../${Normal_Exec_templet_CaseName} `
+#  the_EXEROOT=`grep "\"EXEROOT\"" env_build.xml | awk -F "value=\"" '{print $2}' | awk -F "\"" '{print $1}' `
+  cp -f ${templetePath}/env_build.xml env_build.xml
+xmlchange -file env_build.xml -id EXEROOT -val ${WORKDIR}/${VERSION}${firstmem}
+
 configure -case
 sed -i s/"PBS -N ".*/"PBS -N r_NESMt${firstmem}"/g    ${VERSION}${firstmem}.${machine}.run
 sed -i s/"PBS -A ".*/"PBS -A ${CPUACCOUNT}"/g     ${VERSION}${firstmem}.${machine}.run
@@ -47,13 +62,13 @@ sed -i s/"PBS -l walltime".*/"PBS -l walltime=00:${jobmins}:00"/g ${VERSION}${fi
 cd ${caseDIR}/${VERSION}${firstmem}/Buildconf/
   micom_IDATE=`grep "IDATE    =" micom.buildnml.csh  | awk -F " " '{print $NF}'`
   micom_IDATE0=`grep "IDATE0   =" micom.buildnml.csh  | awk -F " " '{print $NF}'`
-  cp ${funcPath}/dp_NorESM_micom_buildnml_csh micom.buildnml.csh
+  cp ${funcPath}/dp_${CaseConfig}_NorESM_micom_buildnml_csh micom.buildnml.csh
   sed -i s/" IDATE    =".*/" IDATE    ="${micom_IDATE}/g micom.buildnml.csh
   sed -i s/" IDATE0   =".*/" IDATE0   ="${micom_IDATE0}/g micom.buildnml.csh
 
 sed -i s/" RSTCMP   =".*/" RSTCMP   = 0"/g micom.buildnml.csh
 sed -i s/"mfilt".*/"mfilt     = 1"/g cam.buildnml.csh
-sed -i s/"nhtfrq".*/"nhtfrq    = 0"/g cam.buildnml.csh
+sed -i s/"nhtfrq".*/"nhtfrq    = -24"/g cam.buildnml.csh
 sed -i s/" fincl2".*/"fincl2     = ' '"/g cam.buildnml.csh
 sed -i s/"ncdata".*/"ncdata = ${ens_casename}${firstmem}.cam2.i.${branched_ens_date}.nc "/g cam.input_data_list
 sed -i s/"ncdata".*/"ncdata     = '${ens_casename}${firstmem}.cam2.i.${branched_ens_date}.nc'"/g cam.buildnml.csh 
@@ -152,3 +167,14 @@ echo "Prepare the rest of the members"
    fi
 
 fi
+
+
+
+###############################################################################
+echo ${JobStartTime}
+echo `date`" || "${JobName}
+echo ${LinnBreaker}
+
+
+
+

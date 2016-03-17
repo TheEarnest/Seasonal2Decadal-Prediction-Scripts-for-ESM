@@ -50,12 +50,22 @@ for im in ${Prediction_ensembles}; do
       fi
       # duplicate restart files 
       echo "Dupplicate restart files for member "${mem}" ...  "
-      sourceDIR=${ARCHIVE}/${REST_CaseName}${mem}/rest/${NewDate}-00000
-      targetDIR1=${rest_path}/${REST_CaseName}${mem}/rest
-      targetFile2=${ConversionDIR}/${Pred_CasePrefix}_mem${mem}/rest/${NewDate}-00000.tar.gz
+      # target on different restart file base on the initialization config
+      if [ "${is_FOFA}" == "0" ] || [ "${is_FOFA}" == "3" ] ; then 
+        # for free forecast 
+        sourceDIR=${ARCHIVE}/${REST_CaseName}${mem}/rest/${NewDate}-00000
+        targetDIR1=${rest_path}/${REST_CaseName}${mem}/rest
+        targetFile2=${ConversionDIR}/${REST_CaseName}${mem}/rest/${NewDate}-00000.tar.gz
+        fileN=${REST_CaseName}${mem}.clm2.rh0.${NewDate}-00000.nc
+      else
+        sourceDIR=${ARCHIVE}/${Pred_CasePrefix}_mem${mem}/rest/${NewDate}-00000
+        targetDIR1=${rest_path}/${Pred_CasePrefix}_mem${mem}/rest
+        if [ ! -d ${targetDIR1} ]; then mkdir -p ${targetDIR1}; fi
+        targetFile2=${ConversionDIR}/${Pred_CasePrefix}_mem${mem}/rest/${NewDate}-00000.tar.gz
+        fileN=${Pred_CasePrefix}_mem${mem}.clm2.rh0.${NewDate}-00000.nc
+      fi
       if [ -d ${targetDIR1}/${NewDate}-00000 ]; then
-        fileN=${REST_CaseName}${mem}.cam2.rh0.${NewDate}-00000.nc
-        fileCheck=`diff ${sourceDIR}/${fileN} ${targetDIR2}/${NewDate}-00000/${fileN} | awk -F " " '{print $1}'`
+        fileCheck=`diff ${sourceDIR}/${fileN} ${targetDIR1}/${NewDate}-00000/${fileN} | awk -F " " '{print $1}'`
         if [ "${fileCheck}" == "" ]; then
           echo "Files dupplicated for member "${mem}" ...  " 
         else
@@ -71,6 +81,7 @@ for im in ${Prediction_ensembles}; do
     done  # for ensembles
   fi
 done
+
 #########################################################################
 # Convert output to NC4
 #------------------------------------------------------------------------
@@ -83,7 +94,6 @@ sed -i s/"ARCHIVE=".*/"ARCHIVE=\'${ARCHIVEStr}\'"/g ${nc4Scriptfn}
 sed -i s/"VERSION=".*/"VERSION=\'${Pred_CasePrefix}_mem\'"/g ${nc4Scriptfn}
 sed -i s/"CONVERSION_FOLDER=".*/"CONVERSION_FOLDER=\'${FolderStr}\'"/g ${nc4Scriptfn}
 
-exit 777
 # export yr=`echo ${NewDate} | cut -c1-4 `
 # export mm=`echo ${NewDate} | cut -c6-7 `
 # export dd=`echo ${NewDate} | tail -c3 `
@@ -113,6 +123,13 @@ set -e
 # check if re-creat cases is necessary      
 # change to check for each case instead, 05/05/15 MS
 #------------------------------------------------------------------------
+temp_dateS=`date`
+normalExecutable=`readlink -f ${WORKDIR}/../${Normal_Exec_templet_CaseName}/${Normal_Exec_templet_CaseName}.ccsm.exe `  || normalExecutable="None"
+if [ ! -f ${normalExecutable} ]; then
+  . ${funcPath}/dp_func_create_template_NormalCase.sh
+fi
+
+
 firstmem=`echo ${Prediction_ensembles} | awk -F " " '{print $1}' `
 firstmem=`echo 000${firstmem} | tail -c3 `
 for mem in ${Prediction_ensembles} ; do

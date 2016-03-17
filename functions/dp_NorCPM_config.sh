@@ -1,13 +1,14 @@
 # 2015/01/15 by Mao-Lin Shen
 set -e
 CASEDIR=NorCPM_ME
-Ensembles='1'
+Ensembles='2 3'
+CaseConfig=ME
 #dailymicom=yes
-if [ "$CASEDIR" == "NorCPM_ME" ] ; then
+if [ "${CaseConfig}" == "ME" ] ; then
    GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/gx1v6/20101119/grid.nc
    COMPSET=N20TREXTAERCN
    RES=f19_g16 
-elif [ "$CASEDIR" == "NorCPM_F19_tn21" ] ; then
+elif [ "${CaseConfig}" == "F19tn21" ] ; then
    GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/tnx2v1/20130206/grid.nc
    COMPSET=N20TREXT
    RES=f19_tn21 
@@ -27,9 +28,9 @@ PRODUCER='HADISST2'
 ####First Hybrid run possiblility :Ensemble start ####
 #   an ensemble of run =same date multiple case name that finish by CASENAME_memXX
 ens_start=1 #1 means we start hybrid from an ensemble run
-ens_casename=noresm1_ME_hist_s01_mem
-ens_start_date=1970-01-01-00000
-branched_ens_date=1970-01-01-00000
+ens_casename=noresm1_ME_hist_p01_mem
+ens_start_date=1980-05-01-00000
+branched_ens_date=1980-01-01-00000
 ####Second Hybrid run possiblility :Historical start ####
 #   a historical run   =same case name multiple date (hist_start_date:hist_freq_date:NENS*hist_freq_date+hist_start_date)
 hist_start=0 #1 means we start hybrid from anstorical run
@@ -43,7 +44,7 @@ hist_freq_date=10
 SKIPASSIM=1
 SKIPPROP=1
 #start_date=1994-08-15-0000
-the_start_date=1970-01-01-00000
+the_start_date=1980-05-01-00000
 short_start_date=`echo $the_start_date | cut -c1-10`
 STARTMONTH=`echo $the_start_date | cut -c6-7`
 STARTYEAR=`echo $the_start_date | cut -c1-4` 
@@ -51,11 +52,37 @@ STARTYEAR=`echo $the_start_date | cut -c1-4`
 RFACTOR=0
 nbbatch=1
 ENDYEAR=1994
-export forecast_length=7
+export forecast_length=13
 export WORKDIR HOMEDIR VERSION ENSSIZE
-if [ "${forecast_length}" -gt "8"  ]; then
-  (( jobmins = forecast_length * 6 + 6 ))
-  export jobmins=${jobmins}
+job_length=${forecast_length}
+
+if [ "${machine}" == "hexagon_intel" ]; then
+  if [ "${CaseConfig}" == "ME" ] ; then
+    (( resubmit = forecast_length / 8 ))
+    if [ ${job_length} -gt 8 ]; then
+      job_length=2
+    fi
+  elif [ "${CaseConfig}" == "F19tn21" ] ; then
+    (( resubmit = forecast_length / 8 ))   
+    if [ ${job_length} -gt 8 ]; then
+      job_length=8
+    fi
+  else
+    echo "Don't know what you mean"
+  #else
+  #   echo "$CASEDIR not implemented in NorCPM, we quit"
+  fi
+  jobmins=59
 else
-  export jobmins=59
+  echo "I did not test it yet"
+  if [ "${CaseConfig}" == "ME" ] ; then
+    (( jobmins = forecast_length * 20 + 6 ))
+  elif [ "${CaseConfig}" == "F19tn21" ] ; then
+    (( jobmins = forecast_length * 6 + 6 ))
+  else
+    echo "Don't know what you mean"
+  #else
+  #   echo "$CASEDIR not implemented in NorCPM, we quit"
+  fi
+  resubmit=0
 fi

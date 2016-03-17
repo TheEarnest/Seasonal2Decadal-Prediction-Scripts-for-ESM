@@ -38,26 +38,10 @@ rm -rf ${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/*.bldlog.*
 rm -rf ${WORKDIR}/${Pred_CasePrefix}_mem${mem}/run/ccsm.exe
 echo "Re-link obj & executables in case 01 ..."
 mem01folder=${WORKDIR}/${Pred_CasePrefix}_mem${firstmem}
-exec_source=/work/${USER}/noresm/${Normal_Exec_templet_CaseName}
+exec_source=${WORKDIR}/../${Normal_Exec_templet_CaseName}
 
-if [ ! -d ${mem01folder} ]; then
-  cd ${mem01folder}
-  rm -rf atm cpl glc ice lib lnd ocn ccsm mct csm_share pio
-  rm -rf ${mem01folder}/${Pred_CasePrefix}_mem01.ccsm.exe.*
-  ${copy} ${exec_source}/atm ${mem01folder}
-  ${copy} ${exec_source}/cpl ${mem01folder}
-  ${copy} ${exec_source}/glc ${mem01folder}
-  ${copy} ${exec_source}/ice ${mem01folder}
-  ${copy} ${exec_source}/lib ${mem01folder}
-  ${copy} ${exec_source}/lnd ${mem01folder}
-  ${copy} ${exec_source}/mct ${mem01folder}
-  ${copy} ${exec_source}/pio ${mem01folder}
-  ${copy} ${exec_source}/ocn ${mem01folder}
-  ${copy} ${exec_source}/ccsm ${mem01folder}
-  ${copy} ${exec_source}/csm_share ${mem01folder}
-  cp ${exec_source}/${Normal_Exec_templet_CaseName}.ccsm.exe ${mem01folder}/${Pred_CasePrefix}_mem01.ccsm.exe
-  cp ${exec_source}/run/ccsm.exe ${mem01folder}/run/ccsm.exe
-elif [ "${mem}" == "${firstmem}" ]; then
+
+if [ "${mem}" == "${firstmem}" ]; then
   cd ${mem01folder}
   rm -rf atm cpl glc ice lib lnd ocn ccsm mct csm_share pio
   rm -rf ${mem01folder}/${Pred_CasePrefix}_mem01.ccsm.exe.*

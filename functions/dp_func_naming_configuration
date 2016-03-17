@@ -38,6 +38,9 @@ tempPrefix=t_'dp_func_naming_configuration'
     sed -i s/"mainfuncpath=".*/"mainfuncpath=${pathStr}"/g ${configFile} 
     sed -i s/"CaseConfig=".*/"CaseConfig=${CaseConfig}"/g ${configFile}
   done
+  if [ "${is_FOFA}" == "1" ] || [ "${is_FOFA}" == "2" ]; then
+   sed -i s/"ens_casename=".*/"ens_casename=${Pred_CasePrefix}_mem"/g ${NorCPM_config}
+  fi
 ###############################################################################
 echo ${JobStartTime}
 echo `date`" || "${JobName}
