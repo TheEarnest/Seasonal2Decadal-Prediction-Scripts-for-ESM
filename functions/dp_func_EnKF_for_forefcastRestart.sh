@@ -3,13 +3,13 @@
 #
 ${DebugSetting}
 JobStartTime=`date`
-JobName='dp_func_template'
+JobName='dp_func_EnKF_for_forefcastRestart.sh'
 # 
 echo ${LinnBreaker}
 echo ${LinnBreaker}
 echo "Starting "${JobName}" ...... "
 
-tempPrefix=t_'dp_func_template'
+tempPrefix=t_'dp_func_EnKF_for_forefcastRestart.sh'
 ###############################################################################
 
 MainScript=Decadal_Prediction.sh

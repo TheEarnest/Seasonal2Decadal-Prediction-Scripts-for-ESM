@@ -35,7 +35,7 @@ tempPrefix=t_'dp_func_naming_configuration'
   for configFile in ${configFiles}; do 
     sed -i s/"CASEDIR=".*/"CASEDIR=NorCPM_${CaseConfig}"/g ${configFile}
     sed -i s/"ens_casename=".*/"ens_casename=${REST_CaseName}"/g ${configFile}
-    sed -i s/"mainfuncpath=".*/"mainfuncpath=${pathStr}"/g ${configFile} 
+#    sed -i s/"mainfuncpath=".*/"mainfuncpath=${pathStr}"/g ${configFile} 
     sed -i s/"CaseConfig=".*/"CaseConfig=${CaseConfig}"/g ${configFile}
   done
   if [ "${is_FOFA}" == "1" ] || [ "${is_FOFA}" == "2" ]; then

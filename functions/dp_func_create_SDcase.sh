@@ -8,7 +8,7 @@ JobName='dp_func_create_SDcase.sh'
 echo ${LinnBreaker}
 echo ${LinnBreaker}
 echo "Starting "${JobName}" ...... "
-
+set -ex
 tempPrefix=t_'dp_func_create_SDcase.sh'
 ###############################################################################
 MainScript=Decadal_Prediction.sh
@@ -19,7 +19,6 @@ scripthome=`pwd`
 . ${scripthome}/DP_config.sh
 . ${CAMnudging_config}
 start_date=${the_start_date}
-
 #This script will create an ensemble of Noresm for atmosphere nudging 
 # 2015/01/15 by Mao-Lin Shen
 let tmp_date=hist_start_date+hist_freq_date
@@ -97,7 +96,7 @@ if [ "${mem}" == "${firstmem}" ]; then
   sed -i s/"ice_ic".*/"ice_ic     = '${ens_casename}${firstmem}.cice.r.${ens_start_date}.nc'"/g cice.buildnml.csh
   insertLN=`grep -n "nhtfrq" cam.buildnml.csh | awk -F ":" '{print $1}' `
 
-  cp ${funcpath}/CAML26_nudging_namelist CAML26_nudging_namelist
+  cp ${funcPath}/CAML26_nudging_namelist CAML26_nudging_namelist
   yyCAM=`echo ${start_date} | awk -F "-" '{print $1}'`
   mmCAM=`echo ${start_date} | awk -F "-" '{print $2}'`
   sed -i s/"#nuYEAR"/"${yyCAM}"/g CAML26_nudging_namelist
@@ -108,10 +107,9 @@ if [ "${mem}" == "${firstmem}" ]; then
   sed -i s/"#CAM_Max_rlx"/"${CAM_Max_rlx}"/g CAML26_nudging_namelist
 
   sed -i "${insertLN} r CAML26_nudging_namelist" cam.buildnml.csh
-  cp ${funcpath}/CAMnudging_metdata.F90 ${caseDIR}/${VERSION}${firstmem}/SourceMods/src.cam/metdata.F90
-  cp ${funcpath}/CAMnudging_cam_comp.F90 ${caseDIR}/${VERSION}${firstmem}/SourceMods/src.cam/cam_comp.F90
 
-  cp ${funcpath}/CAMnudging_runtime_opts.F90 ${caseDIR}/${VERSION}${firstmem}/SourceMods/src.cam/runtime_opts.F90
+cp -rfv ${funcPath}/${Nudging_SourceMods}/* ${caseDIR}/${VERSION}${firstmem}/SourceMods/
+
 
 
   cd ${caseDIR}/${VERSION}${firstmem}/
@@ -169,10 +167,8 @@ echo "Prepare the rest of the members"
    sed -i s/"PBS -l walltime".*/"PBS -l walltime=00:59:00"/g ${VERSION}${mem}.${machine}.run
 
    echo 'Now setting up the work dir'
-   cp ${funcpath}/CAMnudging_metdata.F90 ${caseDIR}/${VERSION}${mem}/SourceMods/src.cam/metdata.F90
-   cp ${funcpath}/CAMnudging_cam_comp.F90 ${caseDIR}/${VERSION}${mem}/SourceMods/src.cam/cam_comp.F90
+cp -rfv ${funcPath}/${Nudging_SourceMods}/* ${caseDIR}/${VERSION}${mem}/SourceMods/
 
-   cp ${funcpath}/CAMnudging_runtime_opts.F90 ${caseDIR}/${VERSION}${mem}/SourceMods/src.cam/runtime_opts.F90
 
    cd ${WORKDIR}/${VERSION}${mem}
    rm -rf atm cpl glc ice lib lnd ocn ccsm mct csm_share pio

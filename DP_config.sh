@@ -28,7 +28,7 @@ RESTtar_path=/work/earnest/Conversion/noresm1_ME_hist_s01/analysis
 
 
 #Prediction_years=`seq 1991 2006`
-Prediction_years="1990"
+Prediction_years="1991"
 
 #FOLLOWING is related to the starting option
 ens_casename=${REST_CaseName}
@@ -61,6 +61,8 @@ export NorCPM_config=${funcPath}"/dp_NorCPM_config.sh"
 export CAMnudging_config=${funcPath}"/dp_SD_config.sh"
 export Nudging_Exec_templet_CaseName="nudged_NorESM_${CaseConfig}_template_mem01"
 export Normal_Exec_templet_CaseName="normal_NorCPM_${CaseConfig}_template_mem01"
+export Nudging_SourceMods=dp_NudgingCase_SourceMods
+export Normal_SourceMods=dp_NormalCase_SourceMods
 export python=`which python`
 Pmm=`echo ${Prediction_start_date} | cut -c1-2`
 Pdd=`echo ${Prediction_start_date} | tail -c3 `
@@ -74,8 +76,8 @@ export nudging_length=${nudDays}"d" # d, day; m, month; y, year
 
 export Log_Prefix=${Prediction_expPrefix}"_iOA"${is_FOFA}"_pn"${nudging_length}"_pL"${Prediction_length}
 export Prediction_Prefix=${Pred_CasePrefix}
-  (( Prediction_months = Prediction_length + 1 ))
-export Prediction_months=${Prediction_months}
+#  (( Prediction_months = Prediction_length + 1 ))
+export Prediction_months=${Prediction_length}
 export LinnBreaker="--------------------------------------------------------"
 #########################################################################
 # for system log

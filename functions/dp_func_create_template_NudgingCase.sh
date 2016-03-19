@@ -2,6 +2,12 @@
 # 2015/01/15 by Mao-Lin Shen
 set -e
 
+MainScript=Decadal_Prediction.sh
+if [ ! -f ${MainScript} ]; then
+  cd ..
+fi
+scripthome=`pwd`
+. ${scripthome}/DP_config.sh
 . ${CAMnudging_config}
 ENSSIZE=1
 CASEDIR=`echo ${Nudging_Exec_templet_CaseName} | awk -F "_mem" '{print $1}'`
@@ -89,10 +95,7 @@ sed -i s/"#nuPath"/"${met_path}"/g CAML26_nudging_namelist
 sed -i s/"#CAM_Max_rlx"/"${CAM_Max_rlx}"/g CAML26_nudging_namelist
 
 sed -i "${insertLN} r CAML26_nudging_namelist" cam.buildnml.csh
-cp ${funcPath}/CAMnudging_metdata.F90 ${nudcaseDIR}/${VERSION01}/SourceMods/src.cam/metdata.F90
-cp ${funcPath}/CAMnudging_cam_comp.F90 ${nudcaseDIR}/${VERSION01}/SourceMods/src.cam/cam_comp.F90
-
-cp ${funcPath}/CAMnudging_runtime_opts.F90 ${nudcaseDIR}/${VERSION01}/SourceMods/src.cam/runtime_opts.F90
+cp -rfv ${funcPath}/${Nudging_SourceMods}/* ${nudcaseDIR}/${VERSION01}/SourceMods/
 
 # 
 ############################################################################

@@ -2,13 +2,13 @@
 #
 ${DebugSetting}
 JobStartTime=`date`
-JobName='dp_func_template'
+JobName='dp_func_create_ensemble.sh'
 #
 echo ${LinnBreaker}
 echo ${LinnBreaker}
 echo "Starting "${JobName}" ...... "
 
-tempPrefix=t_'dp_func_template'
+tempPrefix=t_'dp_func_create_ensemble.sh'
 ###############################################################################
 
 
@@ -73,7 +73,7 @@ sed -i s/" fincl2".*/"fincl2     = ' '"/g cam.buildnml.csh
 sed -i s/"ncdata".*/"ncdata = ${ens_casename}${firstmem}.cam2.i.${branched_ens_date}.nc "/g cam.input_data_list
 sed -i s/"ncdata".*/"ncdata     = '${ens_casename}${firstmem}.cam2.i.${branched_ens_date}.nc'"/g cam.buildnml.csh 
 
-
+  cp -rfv ${funcPath}/${Normal_SourceMods}/* ${caseDIR}/${VERSION}${firstmem}/SourceMods/
 
 cd ${caseDIR}/${VERSION}${firstmem}/
 echo "Compiling the code, this will take some time"
@@ -130,6 +130,8 @@ echo "Prepare the rest of the members"
    sed -i s/"PBS -N ".*/"PBS -N r_NESMt${mem}"/g  ${VERSION}${mem}.${machine}.run
    sed -i s/"PBS -A ".*/"PBS -A ${CPUACCOUNT}"/g     ${VERSION}${mem}.${machine}.run
    sed -i s/"PBS -l walltime".*/"PBS -l walltime=00:${jobmins}:00"/g ${VERSION}${mem}.${machine}.run
+
+cp -rfv ${funcPath}/${Normal_SourceMods}/* ${caseDIR}/${VERSION}${mem}/SourceMods/
 
    echo 'Now setting up the work dir'
    cd ${WORKDIR}/${VERSION}${mem} 
