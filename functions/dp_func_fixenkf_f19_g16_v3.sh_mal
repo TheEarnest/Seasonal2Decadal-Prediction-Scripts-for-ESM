@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -S /bin/sh
+#PBS -N "fixenkf"
+#PBS -A nn9039k
+#PBS -l walltime=00:59:00,mppwidth=240
+#PBS -o fixenkf.out
+#PBS -e fixenkf.err
+cd /work/${USER}/noresm/ANALYSIS/
+cnt=1
+loop=2
+for il in `seq -w 1 2`; do 
+  for PAK in `seq -w 1 15`; do
+      aprun -n 16 micom_serial_init $cnt   &
+      sleep 1
+      let cnt=cnt+1
+    wait
+  done
+done
+touch FINITO

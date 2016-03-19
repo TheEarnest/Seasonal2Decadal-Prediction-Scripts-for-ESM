@@ -3,13 +3,13 @@
 #
 ${DebugSetting}
 JobStartTime=`date`
-JobName='dp_func_EnKF_for_forefcastRestart.sh'
+JobName='dp_func_template'
 # 
 echo ${LinnBreaker}
 echo ${LinnBreaker}
 echo "Starting "${JobName}" ...... "
 
-tempPrefix=t_'dp_func_EnKF_for_forefcastRestart.sh'
+tempPrefix=t_'dp_func_template'
 ###############################################################################
 
 MainScript=Decadal_Prediction.sh
@@ -17,10 +17,13 @@ if [ ! -f ${MainScript} ]; then
   cd ..
 fi
 scripthome=`pwd`
+pathStr=`echo ${scripthome}/functions | sed 's/\//\\\\\//g'`
+sed -i s/"funcPath=".*/"funcPath=${pathStr}"/g DP_config.sh
 . ${scripthome}/DP_config.sh
 . ${CAMnudging_config}
 export ENSSIZE=30
 
+DARESTtar_path=${RESTtar_path}
 RESTtar_path=${RESTtar_path}_b4DA
 
 #===============================================================================
@@ -111,7 +114,8 @@ pakPrefix=`echo "${ens_casename}" | awk -F "_mem" '{print $1}'`
      fi
      echo 'Finished with EnKF; start post processing'
      date
-     cat ${HOME}/NorESM/EnKF_Script/fixenkf_${RES}_v3.sh_mal | sed  "s/NENS/${ENSSIZE}/g"  > fixenkf.sh
+     
+     cat ${scripthome}/functions/dp_func_fixenkf_${RES}_v3.sh_mal | sed  "s/NENS/${ENSSIZE}/g"  > fixenkf.sh
      sed -i s/"cd \/work".*/"cd ${WORK_Analysis}"/g fixenkf.sh
      chmod 755 fixenkf.sh
      ln -sf ${WORKSHARED}bin/micom_serial_init_${RES}-16-nocopy   micom_serial_init
