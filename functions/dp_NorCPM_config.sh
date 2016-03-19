@@ -20,8 +20,7 @@ else
 #   echo "$CASEDIR not implemented in NorCPM, we quit"
 fi
 VERSION=${CASEDIR}'_mem'
-OBSTYPE='SST'
-PRODUCER='HADISST2'
+
 
 #FOLLOWING is related to the starting option
 #If you are starting from the same model with same configuration set hybrib_run=0
@@ -86,3 +85,6 @@ else
   fi
   resubmit=0
 fi
+
+
+
