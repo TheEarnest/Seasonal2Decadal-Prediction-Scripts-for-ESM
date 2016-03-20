@@ -30,12 +30,12 @@ is_restart_files_ok=1
     fi
     archive_folder=${Rest_ARCHIVE}/${REST_CaseName}${mem}/rest/${yr}-${mm}-${M_dd}-00000/
     archive_filecheck=${archive_folder}/${REST_CaseName}${mem}.micom.r.${yr}-${mm}-${M_dd}-00000.nc
-    if [ -f ${archive_filecheck} ]; then
-      mkdir -p ${targetFolder}/${yr}-${mm}-${M_dd}-00000
-      cp ${archive_folder}/* ${targetFolder}/${yr}-${mm}-${M_dd}-00000/
-    else
+#    if [ -f ${archive_filecheck} ]; then
+#      mkdir -p ${targetFolder}/${yr}-${mm}-${M_dd}-00000
+#      cp ${archive_folder}/* ${targetFolder}/${yr}-${mm}-${M_dd}-00000/
+#    else
       tar xvf ${rest_tar_file} -C ${targetFolder}
-    fi
+#    fi
     # check the ocean restart file
   fi
   # check the ocean restart file
