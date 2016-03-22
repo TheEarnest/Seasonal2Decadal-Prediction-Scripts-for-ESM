@@ -6,13 +6,13 @@
 #
 ${DebugSetting}
 JobStartTime=`date`
-JobName='dp_func_template'
+JobName='dp_func_untar_and_check_restartF'
 #
 echo ${LinnBreaker}
 echo ${LinnBreaker}
 echo "Starting "${JobName}" ...... "
 
-tempPrefix=t_'dp_func_template'
+tempPrefix=t_'dp_func_untar_and_check_restartF'
 ###############################################################################
 restPrefix=`echo ${REST_CaseName} | awk -F "_mem" '{print $1}' `
 Rest_ARCHIVE=`echo ${ARCHIVE} | awk -F "${Pred_CasePrefix}" '{print $1}'`${restPrefix}/analysis

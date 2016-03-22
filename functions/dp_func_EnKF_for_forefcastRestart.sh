@@ -17,6 +17,7 @@ if [ ! -f ${MainScript} ]; then
   cd ..
 fi
 scripthome=`pwd`
+scriptID=`echo ${scripthome} | awk -F "/" '{print $(NF-1)}'`
 pathStr=`echo ${scripthome}/functions | sed 's/\//\\\\\//g'`
 sed -i s/"funcPath=".*/"funcPath=${pathStr}"/g DP_config.sh
 . ${scripthome}/DP_config.sh
@@ -29,8 +30,9 @@ RESTtar_path=${RESTtar_path}_b4DA
 #===============================================================================
 for M_year in ${Prediction_years}; do
   . ${funcPath}/dp_func_naming_configuration
-  WORKDIR=${rest_path}/re_enkf_analysis
-  rest_path=${rest_path}/re_enkf_analysis
+  yr=${M_yr};mm=${M_mm}
+  WORKDIR=${rest_path}/re_enkf_analysis/${yr}${mm}
+  rest_path=${rest_path}/re_enkf_analysis/${yr}${mm}
   if [ ! -d ${WORKDIR}/ANALYSIS/ ] ; then
         mkdir -p ${WORKDIR}/ANALYSIS  || { echo "Could not create ANALYSIS dir" ; exit 1 ; }
   fi
@@ -40,6 +42,10 @@ for M_year in ${Prediction_years}; do
     echo "Check restart files for member "${mem}
     . ${funcPath}/dp_func_untar_and_check_restartF
   done
+
+  if [ ! -d ${WORKDIR}/ANALYSIS/ ] ; then
+        mkdir -p ${WORKDIR}/ANALYSIS  || { echo "Could not create ANALYSIS dir" ; exit 1 ; }
+  fi
 
 
 
@@ -102,7 +108,7 @@ pakPrefix=`echo "${ens_casename}" | awk -F "_mem" '{print $1}'`
      enkfans="R"
      while ( [ "${enkfans}" == "Q" ] || [ "${enkfans}" == "R" ] ) ; do
        enkfans=`qstat ${enkfid} 2>/dev/null | tail -n 1 | awk '{print $5}'`
-       echo "waiting for EnKF-SST"
+       echo "waiting for EnKF-SST at "${HOST}" by scriptID "${scriptID}
        sleep 5s
      done
      set +e
@@ -133,7 +139,7 @@ pakPrefix=`echo "${ens_casename}" | awk -F "_mem" '{print $1}'`
      fixenkfans="R"
      while ( [ "${fixenkfans}" == "Q" ] || [ "${fixenkfans}" == "R" ] ); do
        fixenkfans=`qstat ${fixenkfid} 2>/dev/null | tail -n 1 | awk '{print $5}'`
-       echo "waiting for fix EnKF-SST"
+       echo "waiting for fix EnKF-SST at "${HOST}" by scriptID "${scriptID}
        sleep 15s
      done
      ./ensave forecast $ENSSIZE &
@@ -152,6 +158,18 @@ pakPrefix=`echo "${ens_casename}" | awk -F "_mem" '{print $1}'`
      echo 'Finished with Assim post-processing'
      date
   done
+
+  Rdate=${yr}-${mm}-15-00000
+  for mem in `seq -w 1 30`; do
+    DArest_tar_file=${DARESTtar_path}/${REST_CaseName}${mem}/rest/${yr}-${mm}-${M_dd}-00000.tar.gz
+    tempf=`ls ${WORKDIR}/${REST_CaseName}${mem}/rest/${Rdate}/*.micom.r.${Rdate}.nc`
+    Fprefix=`echo ${tempf} | awk -F "/" '{print $NF}' | awk -F ".micom.r." '{print $1}'`
+    filename=${WORKDIR}/${REST_CaseName}${mem}/rest/${Rdate}/${Fprefix}.micom.r.${Rdate}.nc
+    if [ -f ${filename} ]; then
+      cd ${WORKDIR}/${REST_CaseName}${mem}/rest/
+      tar vczf ${DArest_tar_file} ${Rdate} 
+    fi
+  done # for different members 
 done # for years
 
 ###############################################################################
