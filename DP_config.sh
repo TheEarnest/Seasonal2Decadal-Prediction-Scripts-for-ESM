@@ -8,7 +8,7 @@ REST_CaseName="noresm1_ME_hist_s01_mem"
 Pred_CaseSuffix="p01" # new prediction name 
 Prediction_start_date="05-01" # mm-dd
 Prediction_length=12 # months
-Analysis_restart_months="04"
+Analysis_restart_months="01"
 Analysis_restart_day="15" # fixed by EnKF analysis
 export CAM_Max_rlx=0.0020833333333333333 # maximum nudging coeff 
 #is_FOFA=0; # free forecast  
@@ -27,8 +27,8 @@ export EnKF_ensembles=`seq 1 ${ENSSIZE}`
 RESTtar_path=/work/earnest/Conversion/noresm1_ME_hist_s01/analysis
 
 
-#Prediction_years=`seq 1991 2006`
-Prediction_years="1997 1998 1999"
+Prediction_years=`seq 2002 2007`
+#Prediction_years="1996"
 
 #FOLLOWING is related to the starting option
 ens_casename=${REST_CaseName}
