@@ -46,6 +46,10 @@ xmlchange -file env_run.xml -id RESTART -val 0
  xmlchange -file env_conf.xml -id RUN_STARTDATE -val $short_start_date
  xmlchange -file env_conf.xml -id RUN_REFDATE -val $short_ens_start_date
  xmlchange -file env_conf.xml -id RUN_REFCASE -val ${ens_casename}${firstmem}
+  org_CAM_CONFIG_OPTS=`grep CAM_CONFIG_OPTS  env_conf.xml | awk -F "value=\"" '{print $2}' | awk -F "\" " '{print  $1}'`
+  new_CAM_CONFIG_OPTS=${org_CAM_CONFIG_OPTS}"  -scen_rcp rcp85 "
+  xmlchange -file env_conf.xml -id CAM_CONFIG_OPTS -val "${new_CAM_CONFIG_OPTS}"
+
  if ((${ens_casename}==${CASEDIR})); then
     xmlchange -file env_conf.xml -id BRNCH_RETAIN_CASENAME -val TRUE
  fi
