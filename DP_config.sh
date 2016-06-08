@@ -27,7 +27,7 @@ export EnKF_ensembles=`seq 1 ${ENSSIZE}`
 RESTtar_path=/work/earnest/Conversion/noresm1_ME_hist_s01/analysis
 
 
-Prediction_years=`seq 1990 2009`
+Prediction_years=`seq 2000 2009`
 #Prediction_years="1992"
 
 #FOLLOWING is related to the starting option
