@@ -60,6 +60,7 @@ is_restart_files_ok=1
       RVcheck=`echo "scale=0; ${CVcheck}/1" | bc -l `
       if [ ${RVcheck} -ne 0 ]; then
         Max_try=0
+        is_restart_files_ok=1
       fi
     done
   fi
