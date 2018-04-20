@@ -3,7 +3,7 @@
 
 Ensembles='1 2 3 4 5'
 CaseConfig=ME
-CASEDIR='noresm1_ME_hist_p01'
+CASEDIR=NorCPM_ME
 if [ "${CaseConfig}" == "ME" ] ; then
   GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/gx1v6/20101119/grid.nc
   COMPSET=N20TREXTAERCN
