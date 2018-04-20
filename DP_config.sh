@@ -4,14 +4,14 @@ mailto="earnestshen@gmail.com"
 # Configurations for decadal prediction 
 #------------------------------------------------------------------------
 Prediction_expPrefix="SPtest" # for user only 
-REST_CaseName="ana_1980_s01_mem"
+REST_CaseName="ana_19800115_me_mem"
 Pred_CaseSuffix="p03" # new prediction name 
 Prediction_start_date="04-15" # mm-dd
 Prediction_length=4 # months
 Analysis_restart_months="04"
 Analysis_restart_day="15" # fixed by EnKF analysis
-#export CAM_Max_rlx=0.0020833333333333333 # maximum nudging coeff 
-export CAM_Max_rlx=0.08333333333333333 # maximum nudging coeff
+export CAM_Max_rlx=0.0020833333333333333 # maximum nudging coeff 
+#export CAM_Max_rlx=0.08333333333333333 # maximum nudging coeff
 #is_FOFA=0; # free forecast  
 is_FOFA=1; # Initializing ocean fist and follow up with atmosphere nudging ...
 #is_FOFA=2; # Initializing ocean and atmosphere together, for old analysis which we keep only forecast restart 
@@ -20,13 +20,13 @@ is_FOFA=1; # Initializing ocean fist and follow up with atmosphere nudging ...
 #########################################################################
 # For ensemble configuration 
 #------------------------------------------------------------------------
-export ENSSIZE=1
+export ENSSIZE=2
 nbbatch=8  #Number of group of job going into the queue
 #export Prediction_ensembles="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 19 20 21 22 23 24 25 26 27 28 29 30 18"
-export Prediction_ensembles="1 ";
+export Prediction_ensembles="1 2";
 export EnKF_ensembles=`seq 1 ${ENSSIZE}`
 #RESTtar_path=/work/earnest/Conversion/noresm1_ME_hist_s01/analysis
-RESTtar_path=/tos-project4/NS9039K/shared/norcpm/cases/NorCPM/True_Obs-1980-2000/ana_19800115_me_hindcasts/ana_19800115_me_20100415
+RESTtar_path=/cluster/work/users/earnest/wrk/ana_19800115_me
 
 
 
@@ -43,9 +43,9 @@ export CaseForcing=hist
 export CaseConfig=ME
 Pred_CasePrefix=${CaseModel}"_"${CaseConfig}"_"${CaseForcing}"_"${Pred_CaseSuffix} # new prediction name 
 export CPUACCOUNT=nn9385l
-export CODEVERSION='projectEPOCASA-7/noresm/'
+export CODEVERSION='noresm1-me'
 REST_months="01 02 05 08 11"
-export HOMEDIR=${HOME}/NorESM
+export HOMEDIR=${HOME}/models/NorCPM/models
 # funcPath will be updated by the main script automatically ...
 export funcPath=/nird/home/earnest/Analysis/epocasa/Seasonal2Decadal-Prediction-Scripts-for-NorESM/functions
 export rest_path="/cluster/work/users/work/${USER}/tmp/"${Prediction_expPrefix} #folder where data to be branched are temporarly stored

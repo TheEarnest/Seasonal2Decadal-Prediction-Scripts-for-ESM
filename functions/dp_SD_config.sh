@@ -1,9 +1,9 @@
 #! /bin/ksh
 # 2015/01/15 by Mao-Lin Shen
 
-Ensembles='1 2 3 4 5'
+Ensembles='1 2'
 CaseConfig=ME
-CASEDIR=NorCPM_ME
+CASEDIR='noresm1_ME_hist_p03'
 if [ "${CaseConfig}" == "ME" ] ; then
   GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/gx1v6/20101119/grid.nc
   COMPSET=N20TREXTAERCN
@@ -25,16 +25,16 @@ ANOMALYASSIM=0;  MONTHLY_ANOM='1'; SUPERLAYER='1'
 
 #FOLLOWING is related to the starting option
 ens_start=1 #1 means we start hybrid from an ensemble run
-ens_casename=noresm1_ME_hist_s01_mem
-ens_start_date=2009-04-15-00000
-branched_ens_date=2009-01-01-00000
+ens_casename=ana_19800115_me_mem
+ens_start_date=2010-04-15-00000
+branched_ens_date=2010-01-01-00000
 hist_start=0 #1 means we start hybrid from anstorical run
 #first member use year 0001 and then all member use year+5 
 #TODO Not Finished
 hist_start_date=1500
 hist_freq_date=10
 
-the_start_date=2009-04-15-00000
+the_start_date=2010-04-15-00000
 short_start_date=`echo $the_start_date | cut -c1-10`
 STARTMONTH=`echo $the_start_date | cut -c6-7`
 

@@ -26,48 +26,49 @@ hist_mem_date=`echo 000$tmp_date | tail -5c`
 hist_mem01_date=`echo 000$hist_start_date | tail -5c`
 
 cd ${HOMEDIR}/${CODEVERSION}/scripts
-create_newcase -case ${nudcaseDIR}/${VERSION01} -compset ${COMPSET} -res ${RES} -mach ${machine}
+./create_newcase -case ${nudcaseDIR}/${VERSION01} -compset ${COMPSET} -res ${RES} -mach ${machine}
 cd ${nudcaseDIR}/${VERSION01}
 #Avoid saving log file in your home folder
-xmlchange -file env_run.xml -id LOGDIR -val ${nudWORKDIR}/${VERSION01}/logs
-xmlchange -file env_build.xml -id EXEROOT -val ${nudWORKDIR}/${VERSION01}
-xmlchange -file env_run.xml -id DOUT_S_ROOT -val ${ARCHIVE}/${VERSION01}
+./xmlchange -file env_run.xml -id LOGDIR -val ${nudWORKDIR}/${VERSION01}/logs
+./xmlchange -file env_build.xml -id EXEROOT -val ${nudWORKDIR}/${VERSION01}
+./xmlchange -file env_run.xml -id DOUT_S_ROOT -val ${ARCHIVE}/${VERSION01}
 #Possible that you wish to integrate for 14 days for moving restart in the middle of the month
 nudging_period=`echo ${nudging_length} | sed 's/.$//'`
 nudging_base=`echo ${nudging_length} | tail -c2`
 if [ "${nudging_base}" == "d" ]; then
-  xmlchange -file env_run.xml -id STOP_OPTION -val nday
+  ./xmlchange -file env_run.xml -id STOP_OPTION -val nday
 elif [ "${nudging_base}" == "m" ]; then
-  xmlchange -file env_run.xml -id STOP_OPTION -val nmonth
+  ./xmlchange -file env_run.xml -id STOP_OPTION -val nmonth
 elif [ "${nudging_base}" == "y" ]; then
-  xmlchange -file env_run.xml -id STOP_OPTION -val nyear
+  ./xmlchange -file env_run.xml -id STOP_OPTION -val nyear
 else
-  xmlchange -file env_run.xml -id STOP_OPTION -val nmonth
+  ./xmlchange -file env_run.xml -id STOP_OPTION -val nmonth
 fi
-xmlchange -file env_run.xml -id STOP_N -val ${nudging_period}
-xmlchange -file env_run.xml -id RESUBMIT -val 0
-xmlchange -file env_run.xml -id RESTART -val 0
+./xmlchange -file env_run.xml -id STOP_N -val ${nudging_period}
+./xmlchange -file env_run.xml -id RESUBMIT -val 0
+./xmlchange -file env_run.xml -id RESTART -val 0
+./xmlchange -file env_run.xml -id DIN_LOC_ROOT_CSMDATA -val /cluster/shared/noresm/inputdata
 org_CAM_CONFIG_OPTS=`grep CAM_CONFIG_OPTS  env_conf.xml | awk -F "value=\"" '{print $2}' | awk -F "\" " '{print  $1}'`
 new_CAM_CONFIG_OPTS=${org_CAM_CONFIG_OPTS}" -offline_dyn -scen_rcp rcp85 "
-xmlchange -file env_conf.xml -id CAM_CONFIG_OPTS -val "${new_CAM_CONFIG_OPTS}" 
-xmlchange -file env_run.xml -id CONTINUE_RUN -val FALSE
+./xmlchange -file env_conf.xml -id CAM_CONFIG_OPTS -val "${new_CAM_CONFIG_OPTS}" 
+./xmlchange -file env_run.xml -id CONTINUE_RUN -val FALSE
 #xmlchange -file env_conf.xml -id RUN_TYPE -val hybrid
-xmlchange -file env_conf.xml -id RUN_TYPE -val branch
+./xmlchange -file env_conf.xml -id RUN_TYPE -val branch
 sed -i s/"time ftn".*/"time ftn  -traceback"/g Macros.${machine}
 
 if ((${hist_start})) ; then
   echo "Not yet implemented"; exit 0;
 elif ((${ens_start})) ; then
   short_ens_start_date=`echo $ens_start_date | cut -c1-10`
-  xmlchange -file env_conf.xml -id RUN_STARTDATE -val $short_start_date
-  xmlchange -file env_conf.xml -id RUN_REFDATE -val $short_ens_start_date
-  xmlchange -file env_conf.xml -id RUN_REFCASE -val ${ens_casename}01
+  ./xmlchange -file env_conf.xml -id RUN_STARTDATE -val $short_start_date
+  ./xmlchange -file env_conf.xml -id RUN_REFDATE -val $short_ens_start_date
+  ./xmlchange -file env_conf.xml -id RUN_REFCASE -val ${ens_casename}01
   if ((${ens_casename}==${CASEDIR})); then
-     xmlchange -file env_conf.xml -id BRNCH_RETAIN_CASENAME -val TRUE
+     ./xmlchange -file env_conf.xml -id BRNCH_RETAIN_CASENAME -val TRUE
   fi
 fi
 sed -i s/'module load xt-asyncpe'.*/'module load craype\/2.2.1 '/g env_mach_specific
-configure -case
+./configure -case
 sed -i s/"PBS -N ".*/"PBS -N r_SNESMt01"/g          ${VERSION01}.${machine}.run
 sed -i s/"PBS -A ".*/"PBS -A ${CPUACCOUNT}"/g     ${VERSION01}.${machine}.run
 sed -i s/"PBS -l walltime".*/"PBS -l walltime=00:59:00"/g ${VERSION01}.${machine}.run
@@ -101,6 +102,6 @@ cp -rfv ${funcPath}/${Nudging_SourceMods}/* ${nudcaseDIR}/${VERSION01}/SourceMod
 ############################################################################
 cd ${nudcaseDIR}/${VERSION01}/
 echo "Compiling the code, this will take some time"
-${VERSION01}.${machine}.build
+./${VERSION01}.${machine}.build
 
 

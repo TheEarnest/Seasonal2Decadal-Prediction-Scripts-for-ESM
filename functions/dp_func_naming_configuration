@@ -23,9 +23,9 @@ tempPrefix=t_'dp_func_naming_configuration'
   year=${M_year}
 
   export caseDIR=${HOMEDIR}/cases/${Prediction_ParentPath}
-  export WORKDIR=/work/${USER}/noresm/${Prediction_ParentPath}
-  export ARCHIVE=/work/${USER}/archive/${Prediction_ParentPath}
-  export ConversionDIR=/work/${USER}/Conversion/${Prediction_ParentPath}
+  export WORKDIR=/cluster/work/users/${USER}/noresm/${Prediction_ParentPath}
+  export ARCHIVE=/cluster/work/users/${USER}/archive/${Prediction_ParentPath}
+  export ConversionDIR=/cluster/work/users/${USER}/Conversion/${Prediction_ParentPath}
   export Prediction_sys_log=${ConversionDIR}/"syslog_dp_"${Log_Prefix}
   if [ ! -d ${caseDIR} ]; then mkdir -p ${caseDIR}; fi
   if [ ! -d ${WORKDIR} ]; then mkdir -p ${WORKDIR}; fi
