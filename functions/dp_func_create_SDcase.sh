@@ -29,52 +29,53 @@ hist_mem01_date=`echo 000${hist_start_date} | tail -5c `
 if [ "${mem}" == "${firstmem}" ]; then
 #Prepare member 1 
   cd ${HOMEDIR}/${CODEVERSION}/scripts
-  create_newcase -case ${caseDIR}/${VERSION}${firstmem} -compset ${COMPSET} -res ${RES} -mach ${machine}
+  ./create_newcase -case ${caseDIR}/${VERSION}${firstmem} -compset ${COMPSET} -res ${RES} -mach ${machine}
   mkdir -p ${WORKDIR}/${VERSION}${firstmem}/run
   time cp ${rest_path}/${ens_casename}${firstmem}/rest/${ens_start_date}/* ${WORKDIR}/${VERSION}${firstmem}/run & 
 
   cd ${caseDIR}/${VERSION}${firstmem}
 #Avoid saving log file in your home folder
-  xmlchange -file env_run.xml -id LOGDIR -val ${WORKDIR}/${VERSION}${firstmem}/logs
-  xmlchange -file env_build.xml -id EXEROOT -val ${WORKDIR}/${VERSION}${firstmem}
-  xmlchange -file env_run.xml -id DOUT_S_ROOT -val ${ARCHIVE}/${VERSION}${firstmem}
+  ./xmlchange -file env_run.xml -id LOGDIR -val ${WORKDIR}/${VERSION}${firstmem}/logs
+  ./xmlchange -file env_build.xml -id EXEROOT -val ${WORKDIR}/${VERSION}${firstmem}
+  ./xmlchange -file env_run.xml -id DOUT_S_ROOT -val ${ARCHIVE}/${VERSION}${firstmem}
 #Possible that you wish to integrate for 14 days for moving restart in the middle of the month
   nudging_period=`echo ${nudging_length} | sed 's/.$//'`  # 
   nudging_base=`echo ${nudging_length} | tail -c2`
   if [ "${nudging_base}" == "d" ]; then
-    xmlchange -file env_run.xml -id STOP_OPTION -val nday
+    ./xmlchange -file env_run.xml -id STOP_OPTION -val nday
   elif [ "${nudging_base}" == "m" ]; then
-    xmlchange -file env_run.xml -id STOP_OPTION -val nmonth
+    ./xmlchange -file env_run.xml -id STOP_OPTION -val nmonth
   elif [ "${nudging_base}" == "y" ]; then
-    xmlchange -file env_run.xml -id STOP_OPTION -val nyear
+    ./xmlchange -file env_run.xml -id STOP_OPTION -val nyear
   else
-    xmlchange -file env_run.xml -id STOP_OPTION -val nmonth
+    ./xmlchange -file env_run.xml -id STOP_OPTION -val nmonth
   fi
-  xmlchange -file env_run.xml -id STOP_N -val ${nudging_period}
-  xmlchange -file env_run.xml -id RESUBMIT -val 0
-  xmlchange -file env_run.xml -id RESTART -val 0
+  ./xmlchange -file env_run.xml -id STOP_N -val ${nudging_period}
+  ./xmlchange -file env_run.xml -id RESUBMIT -val 0
+  ./xmlchange -file env_run.xml -id RESTART -val 0
+  ./xmlchange -file env_run.xml -id DIN_LOC_ROOT_CSMDATA -val /cluster/shared/noresm/inputdata
 
   org_CAM_CONFIG_OPTS=`grep CAM_CONFIG_OPTS  env_conf.xml | awk -F "value=\"" '{print $2}' | awk -F "\" " '{print  $1}'`
   new_CAM_CONFIG_OPTS=${org_CAM_CONFIG_OPTS}" -offline_dyn -scen_rcp rcp85 "
-  xmlchange -file env_conf.xml -id CAM_CONFIG_OPTS -val "${new_CAM_CONFIG_OPTS}"
-  xmlchange -file env_run.xml -id CONTINUE_RUN -val FALSE
+  ./xmlchange -file env_conf.xml -id CAM_CONFIG_OPTS -val "${new_CAM_CONFIG_OPTS}"
+  ./xmlchange -file env_run.xml -id CONTINUE_RUN -val FALSE
   #xmlchange -file env_conf.xml -id RUN_TYPE -val hybrid
-  xmlchange -file env_conf.xml -id RUN_TYPE -val branch
+  ./xmlchange -file env_conf.xml -id RUN_TYPE -val branch
   sed -i s/"time ftn".*/"time ftn  -traceback"/g Macros.${machine}
 
   if ((${hist_start})) ; then
     echo "Not yet implemented"; exit 0;
   elif ((${ens_start})) ; then
     short_ens_start_date=`echo $ens_start_date | cut -c1-10`
-    xmlchange -file env_conf.xml -id RUN_STARTDATE -val $short_start_date
-    xmlchange -file env_conf.xml -id RUN_REFDATE -val $short_ens_start_date
-    xmlchange -file env_conf.xml -id RUN_REFCASE -val ${ens_casename}${firstmem}
+    ./xmlchange -file env_conf.xml -id RUN_STARTDATE -val $short_start_date
+    ./xmlchange -file env_conf.xml -id RUN_REFDATE -val $short_ens_start_date
+    ./xmlchange -file env_conf.xml -id RUN_REFCASE -val ${ens_casename}${firstmem}
     if ((${ens_casename}==${CASEDIR})); then
-       xmlchange -file env_conf.xml -id BRNCH_RETAIN_CASENAME -val TRUE
+       ./xmlchange -file env_conf.xml -id BRNCH_RETAIN_CASENAME -val TRUE
     fi
   fi
   sed -i s/'module load xt-asyncpe'.*/'module load craype\/2.2.1 '/g env_mach_specific
-  configure -case
+  ./configure -case
   sed -i s/"PBS -N ".*/"PBS -N r_SNESMt${firstmem}"/g    ${VERSION}${firstmem}.${machine}.run
   sed -i s/"PBS -A ".*/"PBS -A ${CPUACCOUNT}"/g     ${VERSION}${firstmem}.${machine}.run
   sed -i s/"PBS -l walltime".*/"PBS -l walltime=00:59:00"/g ${VERSION}${firstmem}.${machine}.run
@@ -117,7 +118,7 @@ cp -rfv ${funcPath}/${Nudging_SourceMods}/* ${caseDIR}/${VERSION}${firstmem}/Sou
   #${VERSION}${firstmem}.${machine}.clean_build
 
   temp_dateS=`date`
-  ${VERSION}${firstmem}.${machine}.build
+  ./${VERSION}${firstmem}.${machine}.build
   echo ${temp_dateS}
   echo `date`
 
@@ -132,7 +133,7 @@ echo "Prepare the rest of the members"
 #for i in ${Prediction_ensembles_left}; do
 #   mem=`echo 0$i | tail -3c`
    cd ${HOMEDIR}/${CODEVERSION}/scripts/
-   create_newcase -case ${caseDIR}/${VERSION}${mem} -compset ${COMPSET} -res ${RES} -mach  ${machine}
+   ./create_newcase -case ${caseDIR}/${VERSION}${mem} -compset ${COMPSET} -res ${RES} -mach  ${machine}
    cd ${caseDIR}/${VERSION}${mem}
    cat ${caseDIR}/${VERSION}${firstmem}/env_conf.xml | sed  "s/mem${firstmem}/mem${mem}/" > toto
       mv toto env_conf.xml
@@ -142,7 +143,7 @@ echo "Prepare the rest of the members"
       mv toto env_build.xml
    sed -i s/'module load xt-asyncpe'.*/'module load craype\/2.2.1 '/g env_mach_specific
 
-   configure -case
+   ./configure -case
    sed '/ccsm_buildexe/d' ${VERSION}${mem}.${machine}.build > toto
    mv toto ${VERSION}${mem}.${machine}.build
    chmod 755 ${VERSION}${mem}.${machine}.build
