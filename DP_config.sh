@@ -48,7 +48,7 @@ REST_months="01 02 05 08 11"
 export HOMEDIR=${HOME}/models/NorCPM/models
 # funcPath will be updated by the main script automatically ...
 export funcPath=/nird/home/earnest/Analysis/epocasa/Seasonal2Decadal-Prediction-Scripts-for-NorESM/functions
-export rest_path="/cluster/work/users/work/${USER}/tmp/"${Prediction_expPrefix} #folder where data to be branched are temporarly stored
+export rest_path="/cluster/work/users/${USER}/tmp/"${Prediction_expPrefix} #folder where data to be branched are temporarly stored
 HPChost=`echo $HOST | cut -c1-7`
 if [ "${HPChost}" == "hexagon" ]; then
   export machine='hexagon_intel'
