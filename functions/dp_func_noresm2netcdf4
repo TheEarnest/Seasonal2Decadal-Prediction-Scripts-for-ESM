@@ -14,8 +14,8 @@ nthreads=32
 # archive path of case
 #Here we cannot use common.sh because Home folder not accessible from running node
 VERSION='noresm1_ME_hist_p03_mem'
-ARCHIVE='/work/earnest/archive/noresm1_ME_hist_p03/20090501/'
-CONVERSION_FOLDER='/work/earnest/Conversion/noresm1_ME_hist_p03/20090501/'
+ARCHIVE='/cluster/work/users/earnest/archive/noresm1_ME_hist_p03/20100415/'
+CONVERSION_FOLDER='/cluster/work/users/earnest/Conversion/noresm1_ME_hist_p03/20100415/'
 ENSSIZE=30
 
 # zip restart files?

@@ -1,9 +1,9 @@
 #! /bin/ksh
 # 2015/01/15 by Mao-Lin Shen
 
-Ensembles='1 2'
+Ensembles='1 '
 CaseConfig=ME
-CASEDIR='noresm1_ME_hist_p03'
+CASEDIR=NorCPM_ME
 if [ "${CaseConfig}" == "ME" ] ; then
   GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/gx1v6/20101119/grid.nc
   COMPSET=N20TREXTAERCN
