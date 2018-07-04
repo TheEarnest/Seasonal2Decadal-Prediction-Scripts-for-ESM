@@ -40,7 +40,7 @@ ens_casename=${REST_CaseName}
 #------------------------------------------------------------------------
 export CaseModel=noresm1
 export CaseForcing=hist
-export CaseConfig=ME
+export CaseConfig=L
 Pred_CasePrefix=${CaseModel}"_"${CaseConfig}"_"${CaseForcing}"_"${Pred_CaseSuffix} # new prediction name 
 export CPUACCOUNT=nn9385l
 export CODEVERSION='noresm1-me'

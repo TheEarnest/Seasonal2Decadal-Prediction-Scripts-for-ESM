@@ -42,6 +42,7 @@ for im in ${Prediction_ensembles}; do
     for im in ${Prediction_ensembles}; do
       mem=`echo 00${im} | tail -3c`
       # Double check the job status ...
+      
       CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} | grep "${prefix_CAMnudging}_Done" ` || CStatus="None"
       if [ "${CStatus}" == "None" ]; then
         is_jobs_ready4Prediction=0
