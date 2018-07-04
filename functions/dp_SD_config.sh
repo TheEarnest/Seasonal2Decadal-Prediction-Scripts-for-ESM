@@ -25,7 +25,7 @@ ANOMALYASSIM=0;  MONTHLY_ANOM='1'; SUPERLAYER='1'
 
 #FOLLOWING is related to the starting option
 ens_start=1 #1 means we start hybrid from an ensemble run
-ens_casename=ana_19800115_me_mem
+ens_casename=NorCPM_F19_tn21_mem
 ens_start_date=2010-04-15-00000
 branched_ens_date=2010-01-01-00000
 hist_start=0 #1 means we start hybrid from anstorical run

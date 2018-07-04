@@ -4,11 +4,11 @@ mailto="earnestshen@gmail.com"
 # Configurations for decadal prediction 
 #------------------------------------------------------------------------
 Prediction_expPrefix="SPtest" # for user only 
-REST_CaseName="ana_19800115_me_mem"
-Pred_CaseSuffix="p03" # new prediction name 
-Prediction_start_date="04-15" # mm-dd
-Prediction_length=4 # months
-Analysis_restart_months="04"
+REST_CaseName="NorCPM_F19_tn21_mem"
+Pred_CaseSuffix="p05" # new prediction name 
+Prediction_start_date="01-15" # mm-dd
+Prediction_length=1 # months
+Analysis_restart_months="01"
 Analysis_restart_day="15" # fixed by EnKF analysis
 export CAM_Max_rlx=0.0020833333333333333 # maximum nudging coeff 
 #export CAM_Max_rlx=0.08333333333333333 # maximum nudging coeff
@@ -26,12 +26,12 @@ nbbatch=8  #Number of group of job going into the queue
 export Prediction_ensembles="1 ";
 export EnKF_ensembles=`seq 1 ${ENSSIZE}`
 #RESTtar_path=/work/earnest/Conversion/noresm1_ME_hist_s01/analysis
-RESTtar_path=/cluster/work/users/earnest/wrk/ana_19800115_me
-
+#RESTtar_path=/cluster/work/users/earnest/wrk/ana_19800115_me
+RESTtar_path=/cluster/work/users/earnest/temp
 
 
 #Prediction_years=`seq 1994 2009`
-Prediction_years="2010"
+Prediction_years="1980"
 
 #FOLLOWING is related to the starting option
 ens_casename=${REST_CaseName}

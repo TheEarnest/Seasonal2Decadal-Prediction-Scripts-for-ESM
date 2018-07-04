@@ -1,6 +1,6 @@
 # 2015/01/15 by Mao-Lin Shen
 set -e
-CASEDIR='noresm1_ME_hist_p03'
+CASEDIR=NorCPM_ME
 Ensembles='1 '
 CaseConfig=ME
 #dailymicom=yes
@@ -27,7 +27,7 @@ VERSION=${CASEDIR}'_mem'
 ####First Hybrid run possiblility :Ensemble start ####
 #   an ensemble of run =same date multiple case name that finish by CASENAME_memXX
 ens_start=1 #1 means we start hybrid from an ensemble run
-ens_casename=noresm1_ME_hist_p03_mem
+ens_casename=noresm1_ME_hist_p05_mem
 ens_start_date=2010-04-15-00000
 branched_ens_date=2010-01-01-00000
 ####Second Hybrid run possiblility :Historical start ####
