@@ -12,8 +12,8 @@ Analysis_restart_months="01"
 Analysis_restart_day="15" # fixed by EnKF analysis
 export CAM_Max_rlx=0.0020833333333333333 # maximum nudging coeff 
 #export CAM_Max_rlx=0.08333333333333333 # maximum nudging coeff
-#is_FOFA=0; # free forecast  
-is_FOFA=1; # Initializing ocean fist and follow up with atmosphere nudging ...
+is_FOFA=0; # free forecast  
+#is_FOFA=1; # Initializing ocean fist and follow up with atmosphere nudging ...
 #is_FOFA=2; # Initializing ocean and atmosphere together, for old analysis which we keep only forecast restart 
 #is_FOFA=3; # Initializing ocean only ...
 
@@ -47,7 +47,7 @@ export CODEVERSION='noresm1-me'
 REST_months="01 02 05 08 11"
 export HOMEDIR=${HOME}/models/NorCPM/models
 # funcPath will be updated by the main script automatically ...
-export funcPath=/nird/home/earnest/Analysis/epocasa/Seasonal2Decadal-Prediction-Scripts-for-NorESM/functions
+export funcPath=/nird/home/earnest/Analysis/epocasa/Seasonal2Decadal_Prediction/functions
 export rest_path="/cluster/work/users/${USER}/tmp/"${Prediction_expPrefix} #folder where data to be branched are temporarly stored
 HPChost=`echo $HOST | cut -c1-7`
 if [ "${HPChost}" == "hexagon" ]; then

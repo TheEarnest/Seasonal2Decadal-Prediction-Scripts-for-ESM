@@ -67,9 +67,10 @@ sed -i s/"PBS -l walltime".*/"PBS -l walltime=00:${jobmins}:00"/g ${VERSION}${fi
 cd ${caseDIR}/${VERSION}${firstmem}/Buildconf/
   micom_IDATE=`grep "IDATE    =" micom.buildnml.csh  | awk -F " " '{print $NF}'`
   micom_IDATE0=`grep "IDATE0   =" micom.buildnml.csh  | awk -F " " '{print $NF}'`
-  cp ${funcPath}/dp_${CaseConfig}_NorESM_micom_buildnml_csh micom.buildnml.csh
-  sed -i s/" IDATE    =".*/" IDATE    ="${micom_IDATE}/g micom.buildnml.csh
-  sed -i s/" IDATE0   =".*/" IDATE0   ="${micom_IDATE0}/g micom.buildnml.csh
+#MS cp ${funcPath}/dp_${CaseConfig}_NorESM_micom_buildnml_csh micom.buildnml.csh
+  sed -i s/" RSTCMP   =".*/" RSTCMP   = 0"/g micom.buildnml.csh
+  #MS#sed -i s/" IDATE    =".*/" IDATE    ="${micom_IDATE}/g micom.buildnml.csh
+  #seMS#d -i s/" IDATE0   =".*/" IDATE0   ="${micom_IDATE0}/g micom.buildnml.csh
 
 sed -i s/" RSTCMP   =".*/" RSTCMP   = 0"/g micom.buildnml.csh
 sed -i s/"mfilt".*/"mfilt     = 1"/g cam.buildnml.csh

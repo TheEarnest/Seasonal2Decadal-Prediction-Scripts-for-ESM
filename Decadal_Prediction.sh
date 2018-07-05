@@ -45,14 +45,28 @@ for M_year in ${Prediction_years}; do
   #########################################################################
   # Atmosphere nudging step in
   #------------------------------------------------------------------------
+  if [ "${is_FOFA}" == "0" ]; then
+    echo "Start free forecasting ..."
+    . ${funcPath}/dp_func_free_forecasting 
+  fi
+
+  #########################################################################
+  # Atmosphere nudging step in
+  #------------------------------------------------------------------------
   if [ "${is_FOFA}" == "1" ]; then 
     echo "Start nudging run ..."
-   # . ${funcPath}/dp_func_atmosphere_nudging_only
+    . ${funcPath}/dp_func_atmosphere_nudging_only
   else
     echo "Configuration is not finished yet ...  "
     exit
     . ${funcPath}/dp_func_atmosphere_nudging_with_EnKF_SST
   fi
+
+  if [ "${is_FOFA}" == "2" ] || [ "${is_FOFA}" == "3" ]; then
+    echo "Configuration is not finished yet ...  "
+    exit
+  fi
+
   #########################################################################
   # Launch NorESM prediction 
   #------------------------------------------------------------------------
