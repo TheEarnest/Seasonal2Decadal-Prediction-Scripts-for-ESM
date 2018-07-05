@@ -1,17 +1,14 @@
 #! /bin/bash
 # 2015/01/21 by Mao-Lin Shen
-#
 ${DebugSetting}
 JobStartTime=`date`
-JobName='dp_func_Launch_prediction'
-#
+JobName='dp_func_Launch_prediction_FOFA_1'
 echo ${LinnBreaker}
 echo ${LinnBreaker}
 echo "Starting "${JobName}" ...... "
 
-tempPrefix=t_'dp_func_Launch_prediction'
+tempPrefix=t_'dp_func_Launch_prediction_FOFA_1'
 ###############################################################################
-
 
 #########################################################################
 # double check if the jobs are all ready     
@@ -19,17 +16,8 @@ tempPrefix=t_'dp_func_Launch_prediction'
 #------------------------------------------------------------------------
 dd=`echo 00${M_dd} | tail -c3 `
 mm=${M_mm}; yr=${M_yr}
-nudging_period=`echo ${nudging_length} | sed 's/.$//'`
-nudging_base=`echo ${nudging_length} | tail -c2`
-if [ "${nudging_base}" == "d" ]; then
-  NewDate=`${python} ${funcPath}/dp_func_datecheck.py ${yr} ${mm} ${dd} days ${nudging_period} `
-elif [ "${nudging_base}" == "m" ]; then
-  NewDate=`${python} ${funcPath}/dp_func_datecheck.py ${yr} ${mm} ${dd} months ${nudging_period} `
-elif [ "${nudging_base}" == "y" ]; then
-  (( TYear = yr + nudging_period ))
-  NewDate=${TYear}-${mm}-${dd}
-fi
 
+exit 555
 for im in ${Prediction_ensembles}; do
   is_PredictionStart=1
   mem=`echo 00${im} | tail -3c`
@@ -42,29 +30,12 @@ for im in ${Prediction_ensembles}; do
     for im in ${Prediction_ensembles}; do
       mem=`echo 00${im} | tail -3c`
       # Double check the job status ...
-      
-      CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} | grep "${prefix_CAMnudging}_Done" ` || CStatus="None"
-      if [ "${CStatus}" == "None" ]; then
-        is_jobs_ready4Prediction=0
-        echo "Re-check job status ................"
-        exit
-      fi
-      # duplicate restart files 
-      echo "Dupplicate restart files for member "${mem}" ...  "
-      # target on different restart file base on the initialization config
-      if [ "${is_FOFA}" == "0" ] || [ "${is_FOFA}" == "3" ] ; then 
-        # for free forecast 
-        sourceDIR=${ARCHIVE}/${REST_CaseName}${mem}/rest/${NewDate}-00000
-        targetDIR1=${rest_path}/${REST_CaseName}${mem}/rest
-        targetFile2=${ConversionDIR}/${REST_CaseName}${mem}/rest/${NewDate}-00000.tar.gz
-        fileN=${REST_CaseName}${mem}.clm2.rh0.${NewDate}-00000.nc
-      else
-        sourceDIR=${ARCHIVE}/${Pred_CasePrefix}_mem${mem}/rest/${NewDate}-00000
-        targetDIR1=${rest_path}/${Pred_CasePrefix}_mem${mem}/rest
-        if [ ! -d ${targetDIR1} ]; then mkdir -p ${targetDIR1}; fi
-        targetFile2=${ConversionDIR}/${Pred_CasePrefix}_mem${mem}/rest/${NewDate}-00000.tar.gz
-        fileN=${Pred_CasePrefix}_mem${mem}.clm2.rh0.${NewDate}-00000.nc
-      fi
+      echo "${prefix_mem}_${mem} ${prefix_Pyear}_${yr} ${prefix_DAocean}_Done ${prefix_CAMnudging}_Done " >> ${Prediction_sys_log}
+      # for free forecast 
+      sourceDIR=${ARCHIVE}/${REST_CaseName}${mem}/rest/${NewDate}-00000
+      targetDIR1=${rest_path}/${REST_CaseName}${mem}/rest
+      targetFile2=${ConversionDIR}/${REST_CaseName}${mem}/rest/${NewDate}-00000.tar.gz
+      fileN=${REST_CaseName}${mem}.clm2.rh0.${NewDate}-00000.nc
       if [ -d ${targetDIR1}/${NewDate}-00000 ]; then
         fileCheck=`diff ${sourceDIR}/${fileN} ${targetDIR1}/${NewDate}-00000/${fileN} | awk -F " " '{print $1}'`
         if [ "${fileCheck}" == "" ]; then
@@ -83,28 +54,11 @@ for im in ${Prediction_ensembles}; do
   fi
 done
 
-#########################################################################
-# Convert output to NC4
-#------------------------------------------------------------------------
-echo "Monitoring the format conversion ..."
-nc4Scriptfn=${funcPath}"/dp_func_noresm2netcdf4"
-ConverFolder=${ConversionDIR}"/"
-FolderStr=`echo ${ConverFolder} | sed 's/\//\\\\\//g'` 
-ARCHIVEStr=`echo ${ARCHIVE}"/" | sed 's/\//\\\\\//g'`
-sed -i s/"ARCHIVE=".*/"ARCHIVE=\'${ARCHIVEStr}\'"/g ${nc4Scriptfn}
-sed -i s/"VERSION=".*/"VERSION=\'${Pred_CasePrefix}_mem\'"/g ${nc4Scriptfn}
-sed -i s/"CONVERSION_FOLDER=".*/"CONVERSION_FOLDER=\'${FolderStr}\'"/g ${nc4Scriptfn}
-
-# export yr=`echo ${NewDate} | cut -c1-4 `
-# export mm=`echo ${NewDate} | cut -c6-7 `
-# export dd=`echo ${NewDate} | tail -c3 `
-# NewDate=`${python} ${funcPath}/dp_func_datecheck.py ${yr} ${mm} ${dd} months ${Prediction_length} `
-
-
 export Nyr=`echo ${NewDate} | cut -c1-4 `
 export Nmm=`echo ${NewDate} | cut -c6-7 `
 export Ndd=`echo ${NewDate} | tail -c3 `
 
+exit 555
 #if [ "${Nmm}" == "${mm}" ]; then
 #  Tmm=`echo "(${Nmm}-1)" | bc -l` 
 #else

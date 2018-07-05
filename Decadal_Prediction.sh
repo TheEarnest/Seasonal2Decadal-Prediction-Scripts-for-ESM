@@ -47,7 +47,7 @@ for M_year in ${Prediction_years}; do
   #------------------------------------------------------------------------
   if [ "${is_FOFA}" == "0" ]; then
     echo "Start free forecasting ..."
-    . ${funcPath}/dp_func_free_forecasting 
+    #. ${funcPath}/dp_func_free_forecasting 
   fi
 
   #########################################################################
@@ -70,7 +70,7 @@ for M_year in ${Prediction_years}; do
   #########################################################################
   # Launch NorESM prediction 
   #------------------------------------------------------------------------
-  . ${funcPath}/dp_func_Launch_prediction
+  . ${funcPath}/dp_func_Launch_prediction_FOFA_${is_FOFA}
 
 done # for prediction years
 ###############################################################################

@@ -1,5 +1,5 @@
 #! /bin/bash
-# 2015/01/21 by Mao-Lin Shen
+# 2018/07/05 by Mao-Lin Shen
 set -e
 mm=${M_mm}; yr=${M_yr}
 NewDate=${M_yr}-${M_mm}-${M_dd}
