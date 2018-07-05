@@ -2,12 +2,12 @@
 # 2015/01/21 by Mao-Lin Shen
 ${DebugSetting}
 JobStartTime=`date`
-JobName='dp_func_Launch_prediction_FOFA_1'
+JobName='dp_func_Launch_prediction_FOFA_0'
 echo ${LinnBreaker}
 echo ${LinnBreaker}
 echo "Starting "${JobName}" ...... "
 
-tempPrefix=t_'dp_func_Launch_prediction_FOFA_1'
+tempPrefix=t_'dp_func_Launch_prediction_FOFA_0'
 ###############################################################################
 
 #########################################################################

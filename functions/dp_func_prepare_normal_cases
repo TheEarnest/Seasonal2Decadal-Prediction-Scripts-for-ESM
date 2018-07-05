@@ -42,6 +42,7 @@ exec_source=${WORKDIR}/../${Normal_Exec_templet_CaseName}
 
 
 if [ "${mem}" == "${firstmem}" ]; then
+  mkdir -p  ${mem01folder}/run
   cd ${mem01folder}
   rm -rf atm cpl glc ice lib lnd ocn ccsm mct csm_share pio
   rm -rf ${mem01folder}/${Pred_CasePrefix}_mem01.ccsm.exe.*
