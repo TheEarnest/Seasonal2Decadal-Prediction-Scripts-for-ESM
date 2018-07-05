@@ -5,7 +5,7 @@ mailto="earnestshen@gmail.com"
 #------------------------------------------------------------------------
 Prediction_expPrefix="SPtest" # for user only 
 REST_CaseName="NorCPM_F19_tn21_mem"
-Pred_CaseSuffix="p05" # new prediction name 
+Pred_CaseSuffix="pTM01" # new prediction name 
 Prediction_start_date="01-15" # mm-dd
 Prediction_length=1 # months
 Analysis_restart_months="01"
