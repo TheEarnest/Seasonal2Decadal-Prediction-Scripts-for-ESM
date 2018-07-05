@@ -51,7 +51,7 @@ set -ex
 #########################################################################
 # check necessary restart files    
 #------------------------------------------------------------------------
-if [ "${is_check_RES}" == "1" ]; then
+if [ "${is_check_RES}" == "111" ]; then
   yr=`echo 000${M_yr} | tail -5c`
   mm=${Analysis_restart_months}
   for im in ${Prediction_ensembles}; do

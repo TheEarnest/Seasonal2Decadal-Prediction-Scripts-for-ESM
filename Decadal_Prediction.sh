@@ -56,10 +56,6 @@ for M_year in ${Prediction_years}; do
   if [ "${is_FOFA}" == "1" ]; then 
     echo "Start nudging run ..."
     . ${funcPath}/dp_func_atmosphere_nudging_only
-  else
-    echo "Configuration is not finished yet ...  "
-    exit
-    . ${funcPath}/dp_func_atmosphere_nudging_with_EnKF_SST
   fi
 
   if [ "${is_FOFA}" == "2" ] || [ "${is_FOFA}" == "3" ]; then

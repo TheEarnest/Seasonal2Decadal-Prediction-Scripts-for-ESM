@@ -16,41 +16,34 @@ tempPrefix=t_'dp_func_Launch_prediction_FOFA_1'
 #------------------------------------------------------------------------
 dd=`echo 00${M_dd} | tail -c3 `
 mm=${M_mm}; yr=${M_yr}
-
-exit 555
+NewDate=${yr}-${mm}-${dd}
 for im in ${Prediction_ensembles}; do
   is_PredictionStart=1
   mem=`echo 00${im} | tail -3c`
   CStatus=`grep "${prefix_mem}_${mem}" ${Prediction_sys_log} | grep ${prefix_Pyear}_${yr} | grep "${prefix_Prun}_" ` || CStatus="None"
   if [ "${CStatus}" == "None" ] ; then
-    is_PredictionStart=0
-  fi
-
-  if [ "${is_PredictionStart}" == "0" ]; then
-    for im in ${Prediction_ensembles}; do
-      mem=`echo 00${im} | tail -3c`
-      # Double check the job status ...
-      echo "${prefix_mem}_${mem} ${prefix_Pyear}_${yr} ${prefix_DAocean}_Done ${prefix_CAMnudging}_Done " >> ${Prediction_sys_log}
-      # for free forecast 
-      sourceDIR=${ARCHIVE}/${REST_CaseName}${mem}/rest/${NewDate}-00000
-      targetDIR1=${rest_path}/${REST_CaseName}${mem}/rest
-      targetFile2=${ConversionDIR}/${REST_CaseName}${mem}/rest/${NewDate}-00000.tar.gz
-      fileN=${REST_CaseName}${mem}.clm2.rh0.${NewDate}-00000.nc
-      if [ -d ${targetDIR1}/${NewDate}-00000 ]; then
-        fileCheck=`diff ${sourceDIR}/${fileN} ${targetDIR1}/${NewDate}-00000/${fileN} | awk -F " " '{print $1}'`
-        if [ "${fileCheck}" == "" ]; then
-          echo "Files dupplicated for member "${mem}" ...  " 
-        else
-          cp -rf ${sourceDIR} ${targetDIR1} 
-          echo "Files dupplicated for member "${mem}" ...  " 
-        fi
-      elif [ -f ${targetFile2} ]; then
-        tar xvf ${targetFile2} -C ${targetDIR1} 
+    mem=`echo 00${im} | tail -3c`
+    # Double check the job status ...
+    echo "${prefix_mem}_${mem} ${prefix_Pyear}_${yr} ${prefix_DAocean}_Done ${prefix_CAMnudging}_Done " >> ${Prediction_sys_log}
+    # for free forecast 
+    sourceDIR=${rest_path}/${REST_CaseName}${mem}/rest/${NewDate}-00000
+    targetDIR1=${rest_path}/${REST_CaseName}${mem}/rest
+    targetFile2=${ConversionDIR}/${REST_CaseName}${mem}/rest/${NewDate}-00000.tar.gz
+    fileN=${REST_CaseName}${mem}.clm2.rh0.${NewDate}-00000.nc
+    if [ -d ${targetDIR1}/${NewDate}-00000 ]; then
+      fileCheck=`diff ${sourceDIR}/${fileN} ${targetDIR1}/${NewDate}-00000/${fileN} | awk -F " " '{print $1}'`
+      if [ "${fileCheck}" == "" ]; then
+        echo "Files dupplicated for member "${mem}" ...  " 
       else
-        cp -rf ${sourceDIR} ${targetDIR1}
+        cp -rf ${sourceDIR} ${targetDIR1} 
         echo "Files dupplicated for member "${mem}" ...  " 
       fi
-    done  # for ensembles
+    elif [ -f ${targetFile2} ]; then
+      tar xvf ${targetFile2} -C ${targetDIR1} 
+    else
+      cp -rf ${sourceDIR} ${targetDIR1}
+      echo "Files dupplicated for member "${mem}" ...  " 
+    fi
   fi
 done
 
@@ -58,7 +51,6 @@ export Nyr=`echo ${NewDate} | cut -c1-4 `
 export Nmm=`echo ${NewDate} | cut -c6-7 `
 export Ndd=`echo ${NewDate} | tail -c3 `
 
-exit 555
 #if [ "${Nmm}" == "${mm}" ]; then
 #  Tmm=`echo "(${Nmm}-1)" | bc -l` 
 #else
@@ -83,7 +75,6 @@ normalExecutable=`readlink -f ${WORKDIR}/../${Normal_Exec_templet_CaseName}/${No
 if [ ! -f ${normalExecutable} ]; then
   . ${funcPath}/dp_func_create_template_NormalCase.sh
 fi
-
 
 firstmem=`echo ${Prediction_ensembles} | awk -F " " '{print $1}' `
 firstmem=`echo 000${firstmem} | tail -c3 `
@@ -130,6 +121,7 @@ for mem in ${Prediction_ensembles} ; do
     sed -i s/"${JobStatus}"/"${JobNewStatus}"/g ${Prediction_sys_log}
     sleep 5s
   fi
+exit 555
 done
 
 
