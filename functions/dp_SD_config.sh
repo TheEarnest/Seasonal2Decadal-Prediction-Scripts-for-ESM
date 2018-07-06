@@ -2,8 +2,8 @@
 # 2015/01/15 by Mao-Lin Shen
 
 Ensembles='1 '
-CaseConfig=L
-CASEDIR=NorCPM_L
+CaseConfig=ME
+CASEDIR=NorCPM_ME
 if [ "${CaseConfig}" == "ME" ] ; then
   GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/gx1v6/20101119/grid.nc
   COMPSET=N20TREXTAERCN

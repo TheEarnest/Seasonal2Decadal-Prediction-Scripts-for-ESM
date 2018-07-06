@@ -1,8 +1,8 @@
 # 2015/01/15 by Mao-Lin Shen
 set -e
-CASEDIR=NorCPM_L
+CASEDIR=NorCPM_ME
 Ensembles='1 '
-CaseConfig=L
+CaseConfig=ME
 #dailymicom=yes
 if [ "${CaseConfig}" == "ME" ] ; then
    GRIDPATH=/work/shared/noresm/inputdata/ocn/micom/gx1v6/20101119/grid.nc

@@ -20,18 +20,19 @@ is_FOFA=0; # free forecast
 #########################################################################
 # For ensemble configuration 
 #------------------------------------------------------------------------
-export ENSSIZE=1
+export ENSSIZE=3
 nbbatch=8  #Number of group of job going into the queue
 #export Prediction_ensembles="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 19 20 21 22 23 24 25 26 27 28 29 30 18"
-export Prediction_ensembles="1 ";
+export Prediction_ensembles="1 2 3";
 export EnKF_ensembles=`seq 1 ${ENSSIZE}`
 #RESTtar_path=/work/earnest/Conversion/noresm1_ME_hist_s01/analysis
 #RESTtar_path=/cluster/work/users/earnest/wrk/ana_19800115_me
-RESTtar_path=/cluster/work/users/earnest/temp
+#RESTtar_path=/cluster/work/users/earnest/temp
 
+RESTtar_path=/tos-project4/NS9039K/shared/norcpm/cases/NorCPM/NorCPM_V1/ana_19800115_me
 
 #Prediction_years=`seq 1994 2009`
-Prediction_years="1980 1981"
+Prediction_years="1980 "
 
 #FOLLOWING is related to the starting option
 ens_casename=${REST_CaseName}
@@ -40,7 +41,7 @@ ens_casename=${REST_CaseName}
 #------------------------------------------------------------------------
 export CaseModel=noresm1
 export CaseForcing=hist
-export CaseConfig=L
+export CaseConfig=ME
 Pred_CasePrefix=${CaseModel}"_"${CaseConfig}"_"${CaseForcing}"_"${Pred_CaseSuffix} # new prediction name 
 export CPUACCOUNT=nn9385l
 export CODEVERSION='noresm1-me'
