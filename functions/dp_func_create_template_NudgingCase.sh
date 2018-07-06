@@ -12,6 +12,8 @@ scripthome=`pwd`
 ENSSIZE=1
 CASEDIR=`echo ${Nudging_Exec_templet_CaseName} | awk -F "_mem" '{print $1}'`
 VERSION01=${Nudging_Exec_templet_CaseName}
+mem=`echo ${VERSION01} | tail -c3`
+VERSION=`echo ${VERSION01} | awk -F "${mem} '{priont $1}'"`
 start_date=${the_start_date}
 nudcaseDIR=`readlink -f ${caseDIR}/../ `
 nudWORKDIR=`readlink -f ${WORKDIR}/../ `
@@ -67,11 +69,11 @@ elif ((${ens_start})) ; then
      ./xmlchange -file env_conf.xml -id BRNCH_RETAIN_CASENAME -val TRUE
   fi
 fi
-sed -i s/'module load xt-asyncpe'.*/'module load craype\/2.2.1 '/g env_mach_specific
+#sed -i s/'module load xt-asyncpe'.*/'module load craype\/2.2.1 '/g env_mach_specific
 ./configure -case
-sed -i s/"PBS -N ".*/"PBS -N r_SNESMt01"/g          ${VERSION01}.${machine}.run
-sed -i s/"PBS -A ".*/"PBS -A ${CPUACCOUNT}"/g     ${VERSION01}.${machine}.run
-sed -i s/"PBS -l walltime".*/"PBS -l walltime=00:59:00"/g ${VERSION01}.${machine}.run
+
+. ${funcPath}/dp_func_HPC_job_update
+
 cd ${nudcaseDIR}/${VERSION01}/Buildconf/
 sed -i s/" RSTCMP   =".*/" RSTCMP   = 0"/g micom.buildnml.csh
 sed -i s/"mfilt".*/"mfilt     = 1"/g cam.buildnml.csh

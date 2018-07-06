@@ -61,9 +61,9 @@ sed -i s/'module load xt-asyncpe'.*/'module load craype\/2.2.1 '/g env_mach_spec
 ./xmlchange -file env_build.xml -id EXEROOT -val ${WORKDIR}/${VERSION}${firstmem}
 
 ./configure -case
-sed -i s/"PBS -N ".*/"PBS -N r_NESMt${firstmem}"/g    ${VERSION}${firstmem}.${machine}.run
-sed -i s/"PBS -A ".*/"PBS -A ${CPUACCOUNT}"/g     ${VERSION}${firstmem}.${machine}.run
-sed -i s/"PBS -l walltime".*/"PBS -l walltime=00:${jobmins}:00"/g ${VERSION}${firstmem}.${machine}.run
+
+. ${funcPath}/dp_func_HPC_job_update
+
 cd ${caseDIR}/${VERSION}${firstmem}/Buildconf/
   micom_IDATE=`grep "IDATE    =" micom.buildnml.csh  | awk -F " " '{print $NF}'`
   micom_IDATE0=`grep "IDATE0   =" micom.buildnml.csh  | awk -F " " '{print $NF}'`
@@ -133,9 +133,8 @@ echo "Prepare the rest of the members"
    ${VERSION}${mem}.${machine}.build
    cat env_build.xml | sed  's/id="BUILD_COMPLETE"   value="FALSE"/id="BUILD_COMPLETE"   value="TRUE"/' > toto
    mv toto env_build.xml
-   sed -i s/"PBS -N ".*/"PBS -N r_NESMt${mem}"/g  ${VERSION}${mem}.${machine}.run
-   sed -i s/"PBS -A ".*/"PBS -A ${CPUACCOUNT}"/g     ${VERSION}${mem}.${machine}.run
-   sed -i s/"PBS -l walltime".*/"PBS -l walltime=00:${jobmins}:00"/g ${VERSION}${mem}.${machine}.run
+
+   . ${funcPath}/dp_func_HPC_job_update
 
 cp -rfv ${funcPath}/${Normal_SourceMods}/* ${caseDIR}/${VERSION}${mem}/SourceMods/
 

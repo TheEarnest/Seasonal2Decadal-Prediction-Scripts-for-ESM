@@ -1,6 +1,6 @@
 # 2015/01/15 by Mao-Lin Shen
 set -e
-CASEDIR='noresm1_L_hist_pTM01'
+CASEDIR=NorCPM_L
 Ensembles='1 '
 CaseConfig=L
 #dailymicom=yes
