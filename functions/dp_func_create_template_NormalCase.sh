@@ -59,8 +59,8 @@ sed -i s/'module load xt-asyncpe'.*/'module load craype\/2.2.1 '/g env_mach_spec
 
 cd ${nudcaseDIR}/${VERSION01}/Buildconf/
 sed -i s/" RSTCMP   =".*/" RSTCMP   = 0"/g micom.buildnml.csh
-sed -i s/"mfilt".*/"mfilt     = 1"/g cam.buildnml.csh
-sed -i s/"nhtfrq".*/"nhtfrq    = 0"/g cam.buildnml.csh
+sed -i s/"mfilt".*/"mfilt     = 1,1"/g cam.buildnml.csh
+sed -i s/"nhtfrq".*/"nhtfrq    = 0,-24"/g cam.buildnml.csh
 #sed -i s/"nhtfrq".*/"nhtfrq    = -24"/g cam.buildnml.csh
 sed -i s/" fincl2".*/"fincl2     = ' '"/g cam.buildnml.csh
 sed -i s/"ncdata".*/"ncdata = ${ens_casename}01.cam2.i.${branched_ens_date}.nc "/g cam.input_data_list

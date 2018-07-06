@@ -31,7 +31,7 @@ RESTtar_path=/cluster/work/users/earnest/temp
 
 
 #Prediction_years=`seq 1994 2009`
-Prediction_years="1980"
+Prediction_years="1980 1981"
 
 #FOLLOWING is related to the starting option
 ens_casename=${REST_CaseName}
